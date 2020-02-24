@@ -1,0 +1,27 @@
+{
+  "name": "datascience-comunica",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "npm-run-all --parallel dev:*",
+    "dev:api": "nodemon --exec 'babel-node index.js' --ignore db.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@apollo/federation": "latest",
+    "apollo-server-express": "^2.9.16",
+    "body-parser": "^1.19.0",
+    "esm": "^3.2.25",
+    "superagent": "^5.2.1"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "nodemon": "^2.0.2",
+    "npm-run-all": "^4.1.5"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "playground",
+  "version": "1.0.0",
+  "main": "testfile.js",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "esm": "^3.2.25",
+    "express": "^4.17.1",
+    "graphql-ld": "^1.0.1",
+    "graphql-ld-comunica": "^1.0.1",
+    "graphql-ld-sparqlendpoint": "^1.0.0"
+  },
+  "scripts": {
+    "server": "node -r esm ./src/server.js",
+    "test": "node -r esm ./src/working_example_bag.js"
+  }
+}
