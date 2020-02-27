@@ -20,7 +20,8 @@ The introspection queries can range from fairly simple to comprehensively scrapi
   }
 }
 ```
-For which we get the example response from our endpoint in this repository (only  part is shown):
+
+For which we get the example response from our endpoint in this repository (only part is shown):
 
 ```json
 {
@@ -53,6 +54,7 @@ For which we get the example response from our endpoint in this repository (only
   }
 }
 ```
+
 Or the following to obtain the queries:
 
 ```GraphQL
@@ -64,6 +66,7 @@ Or the following to obtain the queries:
   }
 }
 ```
+
 For the current example this only returns `query` as that is the only queryType defined.
 
 For all of the types from the first query we can get more information, basically retrieving part of the schema for `BAGpand` by running the following query:
@@ -86,7 +89,9 @@ For all of the types from the first query we can get more information, basically
   }
 }
 ```
+
 which results in the following response with part of the schema
+
 ```JSON
 {
   "data": {
@@ -125,68 +130,80 @@ which results in the following response with part of the schema
   }
 }
 ```
+
 Now we know which fields are on the `BAGpand` type and which types they are of. It would be very nice to be able to send these queries directly to a Comunica endpoint.
 
 What we would like to actually obtain with an introspection query is information to (re)build the Schema from one query. This can be achieved with the following query ([source](https://github.com/graphql/graphql-js/blob/master/src/utilities/getIntrospectionQuery.js)):
 
 ```graphql
 query IntrospectionQuery {
-    __schema {
-      queryType { name }
-      mutationType { name }
-      subscriptionType { name }
-      types {
-        ...FullType
-      }
-      directives {
-        name
-        description
-        args {
-          ...InputValue
-        }
-        locations
-      }
+  __schema {
+    queryType {
+      name
     }
-  }
-  fragment FullType on __Type {
-    kind
-    name
-    description
-    fields(includeDeprecated: true) {
+    mutationType {
+      name
+    }
+    subscriptionType {
+      name
+    }
+    types {
+      ...FullType
+    }
+    directives {
       name
       description
       args {
         ...InputValue
       }
-      type {
-        ...TypeRef
-      }
-      isDeprecated
-      deprecationReason
-    }
-    inputFields {
-      ...InputValue
-    }
-    interfaces {
-      ...TypeRef
-    }
-    enumValues(includeDeprecated: true) {
-      name
-      description
-      isDeprecated
-      deprecationReason
-    }
-    possibleTypes {
-      ...TypeRef
+      locations
     }
   }
-  fragment InputValue on __InputValue {
+}
+fragment FullType on __Type {
+  kind
+  name
+  description
+  fields(includeDeprecated: true) {
     name
     description
-    type { ...TypeRef }
-    defaultValue
+    args {
+      ...InputValue
+    }
+    type {
+      ...TypeRef
+    }
+    isDeprecated
+    deprecationReason
   }
-  fragment TypeRef on __Type {
+  inputFields {
+    ...InputValue
+  }
+  interfaces {
+    ...TypeRef
+  }
+  enumValues(includeDeprecated: true) {
+    name
+    description
+    isDeprecated
+    deprecationReason
+  }
+  possibleTypes {
+    ...TypeRef
+  }
+}
+fragment InputValue on __InputValue {
+  name
+  description
+  type {
+    ...TypeRef
+  }
+  defaultValue
+}
+fragment TypeRef on __Type {
+  kind
+  name
+  ofType {
     kind
     name
     ofType {
@@ -195,23 +212,20 @@ query IntrospectionQuery {
       ofType {
         kind
         name
-        ofType {
-          kind
-          name
-        }
       }
     }
   }
+}
 ```
+
 As explained [here](https://github.com/apollographql/apollo-server/blob/2b0688fc8802d3600c1cf1cda82af79cce163698/docs/source/testing/mocking.md), this query 'scrapes' all the information based on the graphql [specification](http://spec.graphql.org/June2018/#sec-Schema-Introspection) for types. The results from the query (in the example schema.json) can then be converted into a GraphQL schema object using the following block of code. It uses `buildClientSchema` utility from the `graphql` package
 
 ```typescript
-const { buildClientSchema } = require('graphql');
-const introspectionResult = require('schema.json');
+const { buildClientSchema } = require("graphql");
+const introspectionResult = require("schema.json");
 
 const schema = buildClientSchema(introspectionResult.data);
 ```
-
 
 The example result would be too long to display as a code snippet but is saved in this folder under [introspection_result](introspection_result.json)
 

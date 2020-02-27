@@ -1,4 +1,5 @@
 # Comunica API
+
 This repository sets up a simply node.js server that can query a sparql endpoint with a graphql query and will send back JSON results. The graphql to sparql and handling of the SPARQL query is done by software written by Ruben Taelman: https://www.npmjs.com/package/graphql-ld-comunica
 
 ## Installation
@@ -39,17 +40,22 @@ As an example we are going to send the following graphql query:
   bagstatus(label_nl: "Pand in gebruik (status pand)") @single
 }
 ```
+
 We need a context for this to work:
 
 ```json
 {
-    "@context": {
-      "label_nl": { "@id": "http://www.w3.org/2000/01/rdf-schema#label", "@language": "nl" },
-      "bagstatus": "http://bag.basisregistraties.overheid.nl/def/bag#status",
-      "identificatiecode":"http://bag.basisregistraties.overheid.nl/def/bag#identificatiecode"
-    }
+  "@context": {
+    "label_nl": {
+      "@id": "http://www.w3.org/2000/01/rdf-schema#label",
+      "@language": "nl"
+    },
+    "bagstatus": "http://bag.basisregistraties.overheid.nl/def/bag#status",
+    "identificatiecode": "http://bag.basisregistraties.overheid.nl/def/bag#identificatiecode"
   }
+}
 ```
+
 This query is equivalent to the following SPARQL query:
 
 ```sparql
@@ -60,10 +66,10 @@ SELECT distinct ?o WHERE {
      bag:status [rdfs:label "Pand in gebruik (status pand)"@nl ].
 }
 ```
+
 After starting the server, you can run the query and save the result to an output file with the following line of code:
 
 `curl -X POST localhost:3000 -H "Content-type: application/json" -d @example_args.json > output.json`
-
 
 ## The context
 
@@ -73,9 +79,8 @@ We can represent the architecture of the express server shell around Comunica as
 
 In the current implementation we used Curl to send a json with the GrapQL-LD format to our server with the Comunica module. We use the variation which uses a SPARQL endpoint, but it should have been possible to query directly on Linked Data Fragments (LDF) using Comunica as well (UPDATE 13 February: this has now been implemented!). This would be an interesting next step, as it would not require a SPARQL service to be present (and consuming memory) in order to query the data with GraphQL
 
-
-
 #### Work in progress -the example's schema and its SHACL representation
+
 For this example we can define a GraphQl schema and a SHACL shape that gives the corresponding representation that can be helpful in resolving JSON-LD
 
 ```GraphQl

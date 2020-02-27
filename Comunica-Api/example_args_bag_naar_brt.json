@@ -1,17 +1,22 @@
 {
-  "endpoint":"https://api.labs.kadaster.nl/datasets/kadaster/knowledge-graph/services/knowledge-graph/sparql",
-"query":"{ pandrelatering(_:TEST) @single { sfOverlaps @single {label}}}",
-"context":{
+  "endpoint": "https://api.labs.kadaster.nl/datasets/kadaster/knowledge-graph/services/knowledge-graph/sparql",
+  "query": "{ pandrelatering(_:TEST) @single { sfOverlaps @single {label}}}",
+  "context": {
     "@context": {
-      "label_nl": { "@id": "http://www.w3.org/2000/01/rdf-schema#label", "@language": "nl" },
+      "label_nl": {
+        "@id": "http://www.w3.org/2000/01/rdf-schema#label",
+        "@language": "nl"
+      },
       "bagstatus": "http://bag.basisregistraties.overheid.nl/def/bag#status",
-      "identificatiecode":"http://bag.basisregistraties.overheid.nl/def/bag#identificatiecode",
-        "bagpand" : "http://bag.basisregistraties.overheid.nl/def/bag#Pand",
-        "type" : "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-        "sfOverlaps": {"@reverse":"http://www.opengis.net/ont/geosparql#sfOverlaps"},
-        "label" : "http://www.w3.org/2000/01/rdf-schema#label",
-        "TEST" : "http://bag.basisregistraties.overheid.nl/bag/id/pand/0881100000600492",
-        "pandrelatering": "http://bag.basisregistraties.overheid.nl/def/bag#pandrelatering"
+      "identificatiecode": "http://bag.basisregistraties.overheid.nl/def/bag#identificatiecode",
+      "bagpand": "http://bag.basisregistraties.overheid.nl/def/bag#Pand",
+      "type": "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+      "sfOverlaps": {
+        "@reverse": "http://www.opengis.net/ont/geosparql#sfOverlaps"
+      },
+      "label": "http://www.w3.org/2000/01/rdf-schema#label",
+      "TEST": "http://bag.basisregistraties.overheid.nl/bag/id/pand/0881100000600492",
+      "pandrelatering": "http://bag.basisregistraties.overheid.nl/def/bag#pandrelatering"
     }
   }
 }

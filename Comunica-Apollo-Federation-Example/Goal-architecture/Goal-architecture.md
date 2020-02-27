@@ -1,5 +1,6 @@
 # Goal architecture for Federation with LD sources
-In this document we describe the suggested solution for creating an *introspectable* GraphQL-LD solution that can be used in federated schemas.
+
+In this document we describe the suggested solution for creating an _introspectable_ GraphQL-LD solution that can be used in federated schemas.
 What we would like is an endpoint where we only have to define (i.e. set/configure):
 
 - TypeDefs: effectively the GraphQL schema
@@ -19,6 +20,6 @@ In the [current implementation](https://github.com/kadaster/data-science-team/tr
 - Make one generic resolver
   - which uses the context and endpoint specified
 
-
 ### Future work (out of scope)
+
 Ideally, we would like to generate a schema (typedefs) automatically, based on a Linked Data source.

@@ -1140,11 +1140,7 @@
               "defaultValue": null
             }
           ],
-          "locations": [
-            "FIELD",
-            "FRAGMENT_SPREAD",
-            "INLINE_FRAGMENT"
-          ]
+          "locations": ["FIELD", "FRAGMENT_SPREAD", "INLINE_FRAGMENT"]
         },
         {
           "name": "skip",
@@ -1165,11 +1161,7 @@
               "defaultValue": null
             }
           ],
-          "locations": [
-            "FIELD",
-            "FRAGMENT_SPREAD",
-            "INLINE_FRAGMENT"
-          ]
+          "locations": ["FIELD", "FRAGMENT_SPREAD", "INLINE_FRAGMENT"]
         },
         {
           "name": "deprecated",
@@ -1186,10 +1178,7 @@
               "defaultValue": "\"No longer supported\""
             }
           ],
-          "locations": [
-            "FIELD_DEFINITION",
-            "ENUM_VALUE"
-          ]
+          "locations": ["FIELD_DEFINITION", "ENUM_VALUE"]
         },
         {
           "name": "key",
@@ -1210,28 +1199,19 @@
               "defaultValue": null
             }
           ],
-          "locations": [
-            "OBJECT",
-            "INTERFACE"
-          ]
+          "locations": ["OBJECT", "INTERFACE"]
         },
         {
           "name": "extends",
           "description": "",
           "args": [],
-          "locations": [
-            "OBJECT",
-            "INTERFACE"
-          ]
+          "locations": ["OBJECT", "INTERFACE"]
         },
         {
           "name": "external",
           "description": "",
           "args": [],
-          "locations": [
-            "OBJECT",
-            "FIELD_DEFINITION"
-          ]
+          "locations": ["OBJECT", "FIELD_DEFINITION"]
         },
         {
           "name": "requires",
@@ -1252,9 +1232,7 @@
               "defaultValue": null
             }
           ],
-          "locations": [
-            "FIELD_DEFINITION"
-          ]
+          "locations": ["FIELD_DEFINITION"]
         },
         {
           "name": "provides",
@@ -1275,9 +1253,7 @@
               "defaultValue": null
             }
           ],
-          "locations": [
-            "FIELD_DEFINITION"
-          ]
+          "locations": ["FIELD_DEFINITION"]
         }
       ]
     }

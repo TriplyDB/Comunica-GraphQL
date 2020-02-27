@@ -1,4 +1,5 @@
 # Comunica-Apollo Federation example
+
 This repository makes use of the earlier set-up from https://github.com/kadaster/data-science-team/tree/master/Comunica-Api. In this continuation we set up an Apollo graphql endpoint which makes use of the Comunica embedded server from the Comunica-API code.
 
 ## Installation
@@ -13,25 +14,24 @@ Afterwards, GUI playground of Apollo is available at `localhost:3500/graphql`. Y
 
 ## Example use
 
-As an example we give two queries to enter in the GUI. In the first Any BRT *gebouw* Identifier can be filled in here and it will return the identification code(s) and BAG status(us) of the related BAG *panden*.
+As an example we give two queries to enter in the GUI. In the first Any BRT _gebouw_ Identifier can be filled in here and it will return the identification code(s) and BAG status(us) of the related BAG _panden_.
 
 ```graphql
 {
-  getBagFromBrt(brtId: "100011425"){
+  getBagFromBrt(brtId: "100011425") {
     identificatiecode
     bagstatus
   }
 }
 ```
 
-For the second, a BAG *pand* identifier is entered as an argument and it will return the BRT label. Also it will return the related BAG *panden* i.e. at least the one that we entered as an argument, and possibly more.
-
+For the second, a BAG _pand_ identifier is entered as an argument and it will return the BRT label. Also it will return the related BAG _panden_ i.e. at least the one that we entered as an argument, and possibly more.
 
 ```graphql
 {
-  getBrtFromBag(bagId: "0717100000002852"){
+  getBrtFromBag(bagId: "0717100000002852") {
     label
-    gerelateerdBAGpand{
+    gerelateerdBAGpand {
       identificatiecode
     }
   }
@@ -50,8 +50,6 @@ The final goal was to extend a schema on a GrapQL Federation server. It was demo
 
 ![Federation](Comunica-Apollo-Federation-Example.png)
 
-
-
 ## Further steps
 
 It would be great if we could write a generic resolver that only needs to paste the query which we send to the Apollo graphql endpoint (conform the type definition specification). This way we only need to add a stable context and endpoint for all the possible queries specified in the Typedefs to be valid. For this perhaps some changes need to be made to the Comunica module or a more sophisticated resolver has to be written.
@@ -59,4 +57,5 @@ It would be great if we could write a generic resolver that only needs to paste 
 Furthermore, It would be really nice if we could return a JSON-LD format. This way, a user would be able to turn the result back into triples. The current implementations does rely heavily on Apollo, and it may have a limitation that it cannot deal with JSON-LD properly.
 
 ## Update 13 february
+
 Implemented Comunica over HDT queryEngine: we can now use Linked Data Fragments to query on. Changed the endpoint to the fragments endpoint.
