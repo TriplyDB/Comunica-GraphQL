@@ -15,7 +15,7 @@ import { resolvers } from "./resolvers/index";
 
 export const schema = buildFederatedSchema([{ typeDefs, resolvers }]);
 function init() {
-  const server = new ApolloServer({ typeDefs, resolvers });
+  const server = new ApolloServer({ schema });
   // Expose server
   const PORT = 3001;
   server.listen(PORT, () =>
