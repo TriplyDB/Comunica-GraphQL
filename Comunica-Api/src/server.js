@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import {requestComunica} from "./server-comunica";
 import {requestApollo} from "./server-apollo";
-import {isIntrospectionQuery} from "./introspection-detector";
+import {isApolloQuery} from "./introspection-detector";
 const app = express();
 
 // This code sets up an express server which can be used to send a POST request
@@ -23,7 +23,7 @@ app.post("/", function(req, res) {
   const query = req.body.query;
   const context = req.body.context;
   const schema = req.body.schema;
-  const request = isIntrospectionQuery(query) ? requestApollo : requestComunica;
+  const request = isApolloQuery(query) ? requestApollo : requestComunica;
   request(query, context, endpoint, schema)
     .then(result => {
       console.info(JSON.stringify(result.data, null, 2));
