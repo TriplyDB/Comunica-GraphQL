@@ -2,6 +2,7 @@
 import { makeExecutableSchema } from 'graphql-tools';
 import { ApolloServer, Config, gql } from "apollo-server";
 import { GraphQLSchema } from "graphql";
+import { buildFederatedSchema } from "@apollo/federation";
 
 let apolloServer: ApolloServer;
 
@@ -16,7 +17,7 @@ export async function requestApollo(query: string) {
 
 }
 
-init(makeExecutableSchema({
+init(buildFederatedSchema({
   typeDefs: gql`
   type Query {
     getBagFromBrt(brtId: String): [BAGpand]

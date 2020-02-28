@@ -26,7 +26,7 @@ app.post("/", function(req, res) {
   const request = isApolloQuery(query) ? requestApollo : requestComunica;
   request(query, context, endpoint, schema)
     .then(result => {
-      console.info(JSON.stringify(result.data, null, 2));
+      console.info(JSON.stringify(result, null, 2));
       res.send(result);
     })
     .catch(e => {

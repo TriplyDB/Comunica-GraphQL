@@ -5,16 +5,19 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "@apollo/federation": "^0.12.1",
     "apollo-server": "^2.10.1",
     "body-parser": "^1.19.0",
     "esm": "^3.2.25",
     "express": "^4.17.1",
     "graphql-ld": "^1.0.1",
     "graphql-ld-comunica": "^1.0.1",
-    "graphql-tools": "^4.0.7"
+    "graphql-tools": "^4.0.7",
+    "typescript": "^3.8.2"
   },
   "scripts": {
-    "server": "node -r esm ./src/server.js",
-    "test": "node -r esm ./src/working_example_bag.js"
+    "server": "npm run build && node -r esm ./src/server.js",
+    "test": "node -r esm ./src/working_example_bag.js",
+    "build": "./node_modules/.bin/tsc"
   }
 }
