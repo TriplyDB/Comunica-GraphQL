@@ -12,8 +12,8 @@ const init = (schema: GraphQLSchema) => {
 
 
 export async function requestApollo(query: string) {
-  const res = await apolloServer.executeOperation({ query })
-  console.info(JSON.stringify(res,null,2))
+  return apolloServer.executeOperation({ query })
+
 }
 
 init(makeExecutableSchema({
@@ -34,15 +34,15 @@ init(makeExecutableSchema({
     gerelateerdBRTgebouw: [BRTGBW]
   }`
 }));
-
-requestApollo(// query
-  `
-  {
-    __schema {
-      types {
-        name
-      }
-    }
-  }
-  `
-).then(console.info).catch(console.error)
+//
+// requestApollo(// query
+//   `
+//   {
+//     __schema {
+//       types {
+//         name
+//       }
+//     }
+//   }
+//   `
+// ).then(console.info).catch(console.error)

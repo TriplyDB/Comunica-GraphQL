@@ -49,15 +49,8 @@ var init = function (schema) {
 };
 function requestApollo(query) {
     return __awaiter(this, void 0, void 0, function () {
-        var res;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4, apolloServer.executeOperation({ query: query })];
-                case 1:
-                    res = _a.sent();
-                    console.info(JSON.stringify(res, null, 2));
-                    return [2];
-            }
+            return [2, apolloServer.executeOperation({ query: query })];
         });
     });
 }
@@ -65,5 +58,4 @@ exports.requestApollo = requestApollo;
 init(graphql_tools_1.makeExecutableSchema({
     typeDefs: apollo_server_1.gql(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  type Query {\n    getBagFromBrt(brtId: String): [BAGpand]\n    getBrtFromBag(bagId: String): [BRTGBW]\n  }\n\n  type BRTGBW {\n    label: String\n    gerelateerdBAGpand: [BAGpand]\n  }\n\n  type BAGpand {\n    identificatiecode: String\n    bagstatus: String\n    gerelateerdBRTgebouw: [BRTGBW]\n  }"], ["\n  type Query {\n    getBagFromBrt(brtId: String): [BAGpand]\n    getBrtFromBag(bagId: String): [BRTGBW]\n  }\n\n  type BRTGBW {\n    label: String\n    gerelateerdBAGpand: [BAGpand]\n  }\n\n  type BAGpand {\n    identificatiecode: String\n    bagstatus: String\n    gerelateerdBRTgebouw: [BRTGBW]\n  }"])))
 }));
-requestApollo("\n  {\n    __schema {\n      types {\n        name\n      }\n    }\n  }\n  ").then(console.info)["catch"](console.error);
 var templateObject_1;
