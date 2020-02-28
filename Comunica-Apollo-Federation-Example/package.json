@@ -6,17 +6,19 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "npm-run-all --parallel dev:*",
-    "dev:api": "nodemon --exec 'babel-node index.js' --ignore db.json"
+    "dev:api": "nodemon --exec 'babel-node build/index.js' --ignore db.json"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@apollo/federation": "latest",
+    "@types/superagent": "^4.1.7",
     "apollo-server-express": "^2.9.16",
     "body-parser": "^1.19.0",
     "esm": "^3.2.25",
-    "superagent": "^5.2.1"
+    "superagent": "^5.2.1",
+    "typescript": "^3.8.2"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
