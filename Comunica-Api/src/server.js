@@ -1,28 +1,14 @@
-import { Client } from "graphql-ld";
-import { QueryEngineComunica } from "graphql-ld-comunica";
-//import {QueryEngineSparqlEndpoint} from "graphql-ld-sparqlendpoint";
 import express from "express";
 import bodyParser from "body-parser";
+import {requestComunica} from "./server-comunica";
+import {requestApollo} from "./server-apollo";
+import {isIntrospectionQuery} from "./introspection-detector";
 const app = express();
 
 // This code sets up an express server which can be used to send a POST request
-// to with a GraphQL-LD query which will then be passed to Comunica. The resulting
-// JSON is passed back to the requestor.
+// to with a GraphQL-LD query which will then be passed to Comunica or Apollo.
+// The resulting JSON is passed back to the requestor.
 
-async function request(query, context, endpoint) {
-  // Create a GraphQL-LD client based on a LDF endpoint
-  //
-  const comunicaConfig = {
-    sources: [{ type: "hypermedia", value: endpoint }]
-  };
-
-  const client = new Client({
-    context,
-    queryEngine: new QueryEngineComunica(comunicaConfig)
-  });
-  // Execute the query
-  return client.query({ query });
-}
 app.use(bodyParser.json()); // for parsing application/json
 // Some feedback in case an options request is sent
 app.options("/", function(req, res) {
@@ -36,7 +22,9 @@ app.post("/", function(req, res) {
   const endpoint = req.body.endpoint;
   const query = req.body.query;
   const context = req.body.context;
-  request(query, context, endpoint)
+  const schema = req.body.schema;
+  const request = isIntrospectionQuery(query) ? requestApollo : requestComunica;
+  request(query, context, endpoint, schema)
     .then(result => {
       console.info(JSON.stringify(result.data, null, 2));
       res.send(result);
