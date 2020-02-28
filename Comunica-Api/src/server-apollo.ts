@@ -20,20 +20,12 @@ export async function requestApollo(query: string) {
 init(buildFederatedSchema({
   typeDefs: gql`
   type Query {
-    getBagFromBrt(brtId: String): [BAGpand]
-    getBrtFromBag(bagId: String): [BRTGBW]
+    identificatiecode: [String]
+    bagstatus(label_nl: String): [String]
   }
-
-  type BRTGBW {
-    label: String
-    gerelateerdBAGpand: [BAGpand]
-  }
-
-  type BAGpand {
-    identificatiecode: String
-    bagstatus: String
-    gerelateerdBRTgebouw: [BRTGBW]
-  }`
+  
+  directive @single on FIELD_DEFINITION
+  directive @plural on FIELD_DEFINITION`
 }));
 //
 // requestApollo(// query

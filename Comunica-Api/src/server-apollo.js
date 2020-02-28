@@ -56,6 +56,6 @@ function requestApollo(query) {
 }
 exports.requestApollo = requestApollo;
 init(federation_1.buildFederatedSchema({
-    typeDefs: apollo_server_1.gql(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  type Query {\n    getBagFromBrt(brtId: String): [BAGpand]\n    getBrtFromBag(bagId: String): [BRTGBW]\n  }\n\n  type BRTGBW {\n    label: String\n    gerelateerdBAGpand: [BAGpand]\n  }\n\n  type BAGpand {\n    identificatiecode: String\n    bagstatus: String\n    gerelateerdBRTgebouw: [BRTGBW]\n  }"], ["\n  type Query {\n    getBagFromBrt(brtId: String): [BAGpand]\n    getBrtFromBag(bagId: String): [BRTGBW]\n  }\n\n  type BRTGBW {\n    label: String\n    gerelateerdBAGpand: [BAGpand]\n  }\n\n  type BAGpand {\n    identificatiecode: String\n    bagstatus: String\n    gerelateerdBRTgebouw: [BRTGBW]\n  }"])))
+    typeDefs: apollo_server_1.gql(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  type Query {\n    identificatiecode: [String]\n    bagstatus(label_nl: String): [String]\n  }\n  \n  directive @single on FIELD_DEFINITION\n  directive @plural on FIELD_DEFINITION"], ["\n  type Query {\n    identificatiecode: [String]\n    bagstatus(label_nl: String): [String]\n  }\n  \n  directive @single on FIELD_DEFINITION\n  directive @plural on FIELD_DEFINITION"])))
 }));
 var templateObject_1;
