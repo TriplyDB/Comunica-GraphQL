@@ -25,5 +25,5 @@ export async function getBrtFromBagQuery(args: any) {
       }
     }
   }`
-  return (await runQuery(context, query)).body.data[0].BAGpand.gerelateerdBRTgebouw; // this is a schema
+  return (await runQuery(context, query)).body.data[0].BAGpand.gerelateerdBRTgebouw; 
 }

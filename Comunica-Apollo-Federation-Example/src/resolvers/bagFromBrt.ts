@@ -15,7 +15,6 @@ export async function getBagFromBrtQuery(args: any) {
     INPUT: "http://brt.basisregistraties.overheid.nl/top10nl/id/gebouw/" + args.brtId
   }
 
-
   const query = `{
     BRTGBW(_:INPUT) @single
         {
@@ -25,16 +24,7 @@ export async function getBagFromBrtQuery(args: any) {
                 bagstatus @single
               }
           }
-  }` // some user-query
-
+  }`
 
   return (await runQuery(context, query)).body.data[0].BRTGBW.gerelateerdBAGpand;
 }
-
-
-
-
-
-
-
-// gives typedef, query, we return context
