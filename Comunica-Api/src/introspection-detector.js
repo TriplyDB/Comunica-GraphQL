@@ -1,4 +1,5 @@
-export function isIntrospectionQuery(query) {
+export function isApolloQuery(query) {
   // By convention, GraphQL queries that contain fields starting with '__', indicate introspection.
-  return query.indexOf('__') > 0;
+  return query.indexOf('__') > 0
+    || query.indexOf('_service') > 0; // Also capture service description queries, as sent by Apollo Gateway
 }

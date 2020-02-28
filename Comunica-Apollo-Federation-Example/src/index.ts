@@ -1,5 +1,7 @@
 import express from "express";
 import {ApolloServer, ApolloServerExpressConfig} from "apollo-server-express";
+import {ApolloGateway} from "@apollo/gateway";
+// TODO: stuff below is unused at the moment
 import { buildFederatedSchema } from "@apollo/federation";
 import {typeDefs } from "./typedefs";
 import {resolvers} from './resolvers/index';
@@ -11,8 +13,17 @@ import {resolvers} from './resolvers/index';
 // Setting up the Apollo server
 function init(){
 
-  const schema = buildFederatedSchema([ {typeDefs,resolvers }]);
-  const APOLLO_CONFIG: ApolloServerExpressConfig = {schema, playground: true}
+  const gateway = new ApolloGateway({
+    serviceList: [
+      { name: 'comunica-service-1', url: 'http://localhost:3000' },
+      { name: 'graphql-service-1', url: 'http://localhost:3001' },
+    ]
+  });
+  const APOLLO_CONFIG: ApolloServerExpressConfig = {
+    gateway,
+    playground: true,
+    subscriptions: false,
+  };
   const server = new ApolloServer(APOLLO_CONFIG);
 
   // Expose server
