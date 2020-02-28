@@ -40,8 +40,8 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-var graphql_tools_1 = require("graphql-tools");
 var apollo_server_1 = require("apollo-server");
+var federation_1 = require("@apollo/federation");
 var apolloServer;
 var init = function (schema) {
     var APOLLO_CONFIG = { schema: schema };
@@ -55,7 +55,7 @@ function requestApollo(query) {
     });
 }
 exports.requestApollo = requestApollo;
-init(graphql_tools_1.makeExecutableSchema({
+init(federation_1.buildFederatedSchema({
     typeDefs: apollo_server_1.gql(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n  type Query {\n    getBagFromBrt(brtId: String): [BAGpand]\n    getBrtFromBag(bagId: String): [BRTGBW]\n  }\n\n  type BRTGBW {\n    label: String\n    gerelateerdBAGpand: [BAGpand]\n  }\n\n  type BAGpand {\n    identificatiecode: String\n    bagstatus: String\n    gerelateerdBRTgebouw: [BRTGBW]\n  }"], ["\n  type Query {\n    getBagFromBrt(brtId: String): [BAGpand]\n    getBrtFromBag(bagId: String): [BRTGBW]\n  }\n\n  type BRTGBW {\n    label: String\n    gerelateerdBAGpand: [BAGpand]\n  }\n\n  type BAGpand {\n    identificatiecode: String\n    bagstatus: String\n    gerelateerdBRTgebouw: [BRTGBW]\n  }"])))
 }));
 var templateObject_1;
