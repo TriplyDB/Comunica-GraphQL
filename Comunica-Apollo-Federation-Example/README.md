@@ -6,7 +6,7 @@ This repository makes use of the earlier set-up from https://github.com/kadaster
 
 Prerequisites: make sure the [Comunica-API](https://github.com/kadaster/data-science-team/tree/master/Comunica-Api) is running by running `yarn server` in the correct folder. The API will be available at `localhost:3000`
 
-After cloning this repository run `yarn` in the directory. In order to expose the GraphQL endpoint and also start the GUI run:
+After cloning this repository run `yarn && yarn run build` in the directory. In order to expose the GraphQL endpoint and also start the GUI run:
 
 `yarn run dev`
 

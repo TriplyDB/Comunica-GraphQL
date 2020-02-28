@@ -1,4 +1,4 @@
-import * as express from "express";
+import express from "express";
 import {ApolloServer, ApolloServerExpressConfig} from "apollo-server-express";
 import { buildFederatedSchema } from "@apollo/federation";
 import {typeDefs } from "./typedefs";
