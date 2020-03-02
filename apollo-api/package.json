@@ -1,0 +1,17 @@
+{
+  "name": "apollo-api",
+  "version": "0.0.1",
+  "license": "ISC",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "yarn run build && nodemon ./build/index.js",
+    "build": "./node_modules/.bin/tsc"
+  },
+  "dependencies": {
+    "@apollo/federation": "latest",
+    "apollo-server": "^2.10.1",
+    "nodemon": "^2.0.2",
+    "typescript": "^3.8.2"
+  }
+}

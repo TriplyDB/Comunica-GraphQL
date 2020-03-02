@@ -1,0 +1,16 @@
+{
+  "name": "configurer",
+  "version": "0.0.1",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "yarn run build && node ./build/index.js",
+    "test": "node -r esm ./src/working_example_bag.js",
+    "build": "./node_modules/.bin/tsc"
+  },
+  "dependencies": {
+    "@types/superagent": "^4.1.7",
+    "superagent": "^5.2.2",
+    "typescript": "^3.8.2"
+  }
+}

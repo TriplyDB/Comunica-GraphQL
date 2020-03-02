@@ -1,0 +1,24 @@
+{
+  "name": "comunica-api",
+  "version": "0.0.1",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "yarn run build && nodemon ./build/index.js",
+    "test": "node -r esm ./src/working_example_bag.js",
+    "build": "./node_modules/.bin/tsc"
+  },
+  "dependencies": {
+    "@apollo/federation": "^0.12.1",
+    "@types/superagent": "^4.1.7",
+    "apollo-server": "^2.10.1",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "graphql-ld": "^1.0.1",
+    "graphql-ld-comunica": "^1.0.1",
+    "graphql-ld-sparqlendpoint": "^1.0.0",
+    "nodemon": "^2.0.2",
+    "superagent": "^5.2.2",
+    "typescript": "^3.8.2"
+  }
+}

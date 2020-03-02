@@ -5,7 +5,9 @@
         "noImplicitAny": true,
         "removeComments": true,
         "preserveConstEnums": true,
-        "esModuleInterop":true
+        "sourceMap": true,
+        "esModuleInterop":true,
+        "outDir": "build/"
     },
     "include": [
        "src/"
