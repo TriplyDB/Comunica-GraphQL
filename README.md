@@ -1,67 +1,117 @@
-# Federation over GraphQL and RDF sources
+# GraphQL API over Linked Data sources
 
-This prototype illustrates how one can federate over a combination
-of any number of GraphQL interfaces and RDF-based interfaces via a single GraphQL endpoint.
+The repository implements a GraphQL API over Linked Data.  The API
+must be manually configured once and can then be used by others to
+query.  It is possible to mix Linked Data backends with regular
+GraphQL backends, exposing both through the same GraphQL API.
 
-## Details
+## Usage
 
-### Comunica source
+In order to illustrate how this GraphQL API over Linked Data sources
+works, we are going to run 3 servers:
 
-**Location:** `Comunica-Api/`
+### Start a Linked Data backend
 
-Using Comunica and GraphQL-LD, this wraps over a single RDF-based source, and exposes it as a GraphQL endpoint.
-Additionally, a simple Apollo component is set up that can handle queries against a GraphQL context.
+Run the following commands to start a Linked Data backend for our
+Graph API.  It will run at port 3000.
 
-Whenever a query reaches this server, this component will check whether or not this is an introspection query.
-If it is an introspection query, the query will be delegated to the internal Apollo component.
-If it is not an introspection query, the query will be delegated to the Comunica/GraphQL-LD component.
 
-**Required configuration:**
-* RDF source URL: raw RDF file, SPARQL endpoint, TPF interface, ...
-* JSON-LD context: for non-introspection queries handled by GraphQL-LD
-* GraphQL schema: for introspection queries handled by Apollo
+```sh
+cd comunica-api
+yarn
+yarn run dev
+```
 
-### GraphQL source
+The Linked Data backend must be configured once.  This is done by
+running the following commands:
 
-**Location:** `dummy-graphQL-endpoint/`
+```sh
+cd configurer
+yarn
+yarn run dev
+```
+
+We can start one or more Linked data backends.
+
+### Start a normal GraphQL backend
+
+Run the following commands to start a normal GraphQL backend.  It will
+run at port 3001.
+
+```sh
+cd apollo-api
+yarn
+yarn run dev
+```
+
+This illustrates that we can mix Linked Data with non-Linked Data
+backends.  We can start zero or more non-Linked Data backends.
+
+### Start the Gateway
+
+Run the following commands to start the GraphQL API which uses the
+above started backends.  It will run at port 3500, where GraphQL
+queries can now be issued over the Linked Data and non-Linked Data
+backends.
+
+```sh
+cd apollo-gateway
+yarn
+yarn run dev
+```
+
+## Source structure
+
+### Comunica source (`comunica-api`)
+
+Using Comunica and GraphQL-LD, this wraps over a single RDF-based
+source, and exposes it as a GraphQL endpoint.  Additionally, a simple
+Apollo component is set up that can handle queries against a GraphQL
+context.
+
+Whenever a query reaches this server, this component will check
+whether or not this is an introspection query.  If it is an
+introspection query, the query will be delegated to the internal
+Apollo component.  If it is not an introspection query, the query will
+be delegated to the Comunica/GraphQL-LD component.
+
+Required configuration:
+
+  - RDF source URL : raw RDF file, SPARQL endpoint, TPF interface, …
+  - JSON-LD context: for non-introspection queries handled by GraphQL-LD
+  - GraphQL schema: for introspection queries handled by Apollo
+
+### GraphQL source (`apollo-api`)
 
 This sets up a simple GraphQL endpoint with some dummy resolvers.
 
 This can be replaced by any other GraphQL endpoint.
 
-### GraphQL federator
+### GraphQL federator (`apollo-gateway`)
 
-**Location:** `Comunica-Apollo-Federation-Example`
-
-This sets up a root GraphQL endpoint that federates over any number of GraphQL endpoints.
-In this case, it federates over localhost:3000 and localhost:3001,
-which correspond to a Comunica/GraphQL-LD source and a GraphQL source.
+This sets up a root GraphQL endpoint that federates over any number of
+GraphQL endpoints.  In this case, it federates over
+http://localhost:3000 and http://localhost:3001, which correspond to a
+Comunica/GraphQL-LD source and a GraphQL source.
 
 The configured sources can be changed easily within the source code.
 
-## Usage
+## Example queries
 
-Run the following scripts in separate terminal sessions.
+### Query the schema
 
-TODO: make a convenience script for starting everything in parallel.
-
-Start the Comunica source (port 3000):
-```bash
-cd Comunica-Api
-npm run dev
+```graphql
+{__schema{types{name}}}
 ```
 
-Start the GraphQL source (port 3001):
-```bash
-cd dummy-graphQL-endpoint
-npm run dev
+### Query the non-Linked Data backend
+
+```graphql
+{books{author}}
 ```
 
-Start the GraphQL federator (port 3500):
-```bash
-cd Comunica-Apollo-Federation-Example
-npm run dev
-```
+### Query the Linked Data backend
 
-Now, we can execute any GraphQL query at http://localhost:3500.
-The GraphQL federator will automatically delegate between the Comunica source and the GraphQL source.
+```graphql
+{mes{name}}
+```
