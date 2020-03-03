@@ -36,6 +36,7 @@ app.patch("/config", async function(req, res) {
 
   let converted: ComApiConfig = {};
   if (configuration.endpoint) converted.endpoint = configuration.endpoint;
+  if (configuration.endpointType) converted.endpointType = configuration.endpointType as ComApiConfig['endpointType'];
   if (configuration.context) converted.context = configuration.context;
   if (configuration.typeDefs) converted.typeDefs = gql(configuration.typeDefs);
   // TODO validate
@@ -60,7 +61,7 @@ app.patch("/config", async function(req, res) {
     return res
       .status(400)
       .send(
-        "endpoint type is not configured. Specify endpoint at /config first."
+        "endpoint type is not configured. Specify endpointType at /config first."
       );
   }
   console.info("Successfully configured");

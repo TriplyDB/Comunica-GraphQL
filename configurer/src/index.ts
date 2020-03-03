@@ -23,8 +23,9 @@ const context = {
 superagent
   .patch("http://localhost:3000/config")
   .send({ endpoint, endpointType, typeDefs, context })
-  .catch(console.error)
   .then((response: superagent.Response) => {
-    if (response.error) console.error(response.error);
-    console.info(response.text);
+    if (response?.error) console.error(response.error);
+    console.error(response?.status, response?.text)
+  }).catch((e)=>{
+    console.error(e?.status, e?.response?.text)
   });
