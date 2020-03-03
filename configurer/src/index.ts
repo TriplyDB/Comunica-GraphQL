@@ -1,14 +1,24 @@
 import * as superagent from "superagent";
 
-// const endpoint =
-//   "https://api.labs.kadaster.nl/datasets/kadaster/knowledge-graph/services/knowledge-graph/sparql";
-// const endpointType = "SPARQL";
-const endpoint = "https://api.labs.kadaster.nl/datasets/kadaster/knowledge-graph/fragments";
-const endpointType = "fragments";
+const endpoint =
+ "https://api.labs.kadaster.nl/datasets/kadaster/knowledge-graph/services/knowledge-graph/sparql";
+ const endpointType = "SPARQL";
+//const endpoint = "https://api.labs.kadaster.nl/datasets/kadaster/knowledge-graph/fragments";
+//const endpointType = "fragments";
 const typeDefs = `
   type Query  {
       brewedBy: [brewery],
       regio: [buurt]
+      getBag(indentificatiecode: String): [BAGpand]
+  }
+
+  type BAGpand  {
+    identificatiecode: String
+    bagstatus: [Label]
+    }
+
+  type Label {
+    label: [String]
   }
 
   type buurt {
@@ -69,6 +79,9 @@ const context = {
     asWKT: "http://www.opengis.net/ont/geosparql#asWKT",
     label: "http://www.w3.org/2000/01/rdf-schema#label",
     regioCode: "https://data.pldn.nl/cbs/wijken-buurten/def/cbs#regiocode",
+    bagstatus: "http://bag.basisregistraties.overheid.nl/def/bag#status",
+    identificatiecode:"http://bag.basisregistraties.overheid.nl/def/bag#identificatiecode",
+    getBag: {"@reverse":"http://bag.basisregistraties.overheid.nl/def/bag#identificatiecode"},
     regio: "https://data.pldn.nl/cbs/wijken-buurten/def/dimension#regio"
   }
 };
