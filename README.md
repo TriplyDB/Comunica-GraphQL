@@ -131,3 +131,23 @@ The configured sources can be changed easily within the source code.
   }
 }
 ```
+
+```graphql
+{
+  hero {
+    name
+    friends {
+      name
+    }
+  }
+}
+```
+
+```graphql
+{
+  hero {
+    name
+    id2
+  }
+}
+```
