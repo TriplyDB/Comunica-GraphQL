@@ -13,6 +13,7 @@
     "@types/superagent": "^4.1.7",
     "apollo-server": "^2.10.1",
     "body-parser": "^1.19.0",
+    "commander": "^4.1.1",
     "express": "^4.17.1",
     "graphql-ld": "^1.0.1",
     "graphql-ld-comunica": "^1.0.1",

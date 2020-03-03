@@ -13,12 +13,13 @@ works, we are going to run 3 servers:
 ### Start a Linked Data backend
 
 Run the following commands to start a Linked Data backend for our
-Graph API. It will run at port 3000.
+Graph API. It will run at port 3000 by default.
+If you wish to run multiple Linked-Data backends, supply a unique port number with the `port` option.
 
 ```sh
 cd comunica-api
 yarn
-yarn run dev
+yarn run dev #--port=3002
 ```
 
 The Linked Data backend must be configured after the linked data backend has been (re-)started.
@@ -30,18 +31,16 @@ yarn
 yarn run dev
 ```
 
-We can start one Linked data backends. To start multiple backends you'll need to change
-the port by updating the commandline argument.
-
 ### Start a normal GraphQL backend
 
 Run the following commands to start a normal GraphQL backend. It will
-run at port 3001.
+run at port 3001 by default.
+If you wish to run multiple GraphQL backends, supply a unique port number with the `port` option.
 
 ```sh
 cd apollo-api
 yarn
-yarn run dev
+yarn run dev #--port=3004
 ```
 
 This illustrates that we can mix Linked Data with non-Linked Data
@@ -53,6 +52,9 @@ Run the following commands to start the GraphQL API which uses the
 above started backends. It will run at port 3500, where GraphQL
 queries can now be issued over the Linked Data and non-Linked Data
 backends.
+
+If you have more than one Linked-Data backend, or more than one GraphQL-backend, or you use non-default ports for the backends (by supplying a `port` argument as described above),
+you will first need to change the list of endpoints (`serviceList`) in [apollo-gateway/src/index.ts](apollo-gateway/src/index.ts) to reflect the changes.
 
 ```sh
 cd apollo-gateway

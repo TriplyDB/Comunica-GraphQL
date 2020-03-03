@@ -7,6 +7,7 @@ import { buildFederatedSchema } from "@apollo/federation";
 import { Client } from "graphql-ld";
 import { QueryEngineComunica } from "graphql-ld-comunica";
 import { QueryEngineSparqlEndpoint } from "graphql-ld-sparqlendpoint";
+import commander from "commander";
 QueryEngineComunica;
 interface RequestConfig {
   endpoint?: string;
@@ -113,5 +114,9 @@ app.post("/query", async function(req, res) {
     res.status(400).send(e.message);
   }
 });
-console.info("Comunica-Api listening at http://localhost:3000");
-app.listen(3000);
+const DEFAULT_PORT=3000;
+commander.option("-p, --port <port>", "Port number, defaults to "+DEFAULT_PORT)
+commander.parse(process.argv);
+const port = commander.port||DEFAULT_PORT;
+app.listen(port);
+console.info("Comunica-Api listening at http://localhost:"+port);
