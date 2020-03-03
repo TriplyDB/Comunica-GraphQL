@@ -151,3 +151,7 @@ The configured sources can be changed easily within the source code.
   }
 }
 ```
+
+## Known limitations
+
+- Two different endpoints can not have the same queries specified in their typedefs.

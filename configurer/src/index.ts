@@ -1,45 +1,75 @@
 import * as superagent from "superagent";
 
 // const endpoint =
-//   "https://api.nightly.triply.cc/datasets/ysg/bob/services/bob/sparql";
+//   "https://api.labs.kadaster.nl/datasets/kadaster/knowledge-graph/services/knowledge-graph/sparql";
 // const endpointType = "SPARQL";
-const endpoint =
-  "https://api.nightly.triply.cc/datasets/ysg/bob/fragments";
+const endpoint = "https://api.labs.kadaster.nl/datasets/kadaster/knowledge-graph/fragments";
 const endpointType = "fragments";
 const typeDefs = `
   type Query  {
-      mes: [me],
-      hero: [hero]
+      brewedBy: [brewery],
+      regio: [buurt]
   }
 
-  type me {
-    name: [String]
+  type buurt {
+    hasGeometry: [geometery],
+    sfWithin: [wijk],
+    label: [String],
+    regioCode: [String]
   }
 
-  type hero {
-    name: [String]
-    id2: [String]
-    friends: [hero]
+  type geometery {
+    asWKT: [String]
+  }
+
+  type wijk {
+    hasGeometry: [geometery],
+    sfWithin: [gemeente],
+    label: [String],
+    regioCode: [String]
+  }
+
+  type gemeente {
+    hasGeometry: [geometery],
+    sfWithin: [land],
+    label: [String],
+    regioCode: [String]
+  }
+
+  type land {
+    hasGeometry: [geometery],
+    label: [String],
+    regioCode: [String]
+  }
+
+
+  type brewery {
+    address: [Address],
+    email: [String],
+    jaarproduktie: [String]
+  }
+  type Address {
+    addressLocality: [String],
+    postalCode: [String]
+    streetAddress: [String]
   }
   `;
 
 const context = {
   "@context": {
-    me: "http://example.org/me",
-    id2: "http://example.org/id",
-    mes: "http://example.org/me",
-    name: "http://example.org/name",
-    hero: "http://example.org/hero",
-    human: "http://example.org/human",
-    height: "http://example.org/height",
-    friends: "http://example.org/friends",
-    episode: "http://example.org/episode",
-    primaryFunction: "http://example.org/primaryFunction",
-    JEDI: "http://example.org/types/Jedi",
-    Droid: "http://example.org/types/Droid",
-    Human: "http://example.org/types/Human",
-    appearsIn: "http://example.org/appearsIn",
-    EMPIRE: "http://example.org/types/Empire"
+    brewedBy: "https://data.labs.kadaster.nl/dbeerpedia/dbeerpedia/vocab/brewedby",
+    address: "http://schema.org/address",
+    email: "http://schema.org/email",
+    opgericht: "https://data.labs.kadaster.nl/dbeerpedia/dbeerpedia/vocab/jaarproduktie",
+    addressLocality: "http://schema.org/addressLocality",
+    postalCode: "http://schema.org/postalCode",
+    streetAddress: "http://schema.org/streetAddress",
+    hasGeometry: "http://schema.org/addressLocality",
+    sfWithin: "http://schema.org/addressLocality",
+    asWKT: "http://www.opengis.net/ont/geosparql#asWKT",
+    label: "http://www.w3.org/2000/01/rdf-schema#label",
+    regioCode: "https://data.pldn.nl/cbs/wijken-buurten/def/cbs#regiocode",
+    regio: "https://data.pldn.nl/cbs/wijken-buurten/def/dimension#regio"
   }
 };
 
