@@ -10,12 +10,14 @@ import { QueryEngineSparqlEndpoint } from "graphql-ld-sparqlendpoint";
 QueryEngineComunica;
 interface RequestConfig {
   endpoint?: string;
+  endpointType?: string;
   typeDefs?: string;
   context?: { [key: string]: any };
 }
 
 interface ComApiConfig {
   endpoint?: string;
+  endpointType?: "SPARQL" | "fragments";
   typeDefs?: DocumentNode;
   schema?: GraphQLSchema;
   context?: { [key: string]: any };
@@ -41,11 +43,25 @@ app.patch("/config", async function(req, res) {
   const schema = buildFederatedSchema({ typeDefs: config.typeDefs });
   const APOLLO_SERVER: Config = { schema };
   apolloServer = new ApolloServer(APOLLO_SERVER);
-
-  comunicaServer = new Client({
-    context: config.context,
-    queryEngine: new QueryEngineSparqlEndpoint(config.endpoint)
-  });
+  if (config.endpointType === "SPARQL") {
+    comunicaServer = new Client({
+      context: config.context,
+      queryEngine: new QueryEngineSparqlEndpoint(config.endpoint)
+    });
+  } else if (config.endpointType === "fragments") {
+    comunicaServer = new Client({
+      context: config.context,
+      queryEngine: new QueryEngineComunica({
+        sources: [{ type: "hypermedia", value: config.endpoint }]
+      })
+    });
+  } else {
+    return res
+      .status(400)
+      .send(
+        "endpoint type is not configured. Specify endpoint at /config first."
+      );
+  }
   console.info("Successfully configured");
   res.sendStatus(200);
   console.info(config.endpoint);
