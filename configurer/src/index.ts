@@ -9,12 +9,13 @@ const typeDefs = `
   type Query  {
       brewedBy: [brewery],
       regio: [buurt]
-      getBag(indentificatiecode: String): [BAGpand]
+      getBag(bouwjaar: Int): [BAGpand]
   }
 
   type BAGpand  {
-    identificatiecode: String
+    identificatiecode: [String]
     bagstatus: [Label]
+    bouwjaar: Int
     }
 
   type Label {
@@ -76,6 +77,7 @@ const context = {
     streetAddress: "http://schema.org/streetAddress",
     hasGeometry: "http://schema.org/addressLocality",
     sfWithin: "http://schema.org/addressLocality",
+    bouwjaar:"http://bag.basisregistraties.overheid.nl/def/bag#oorspronkelijkBouwjaar",
     asWKT: "http://www.opengis.net/ont/geosparql#asWKT",
     label: "http://www.w3.org/2000/01/rdf-schema#label",
     regioCode: "https://data.pldn.nl/cbs/wijken-buurten/def/cbs#regiocode",

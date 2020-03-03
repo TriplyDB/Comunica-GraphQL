@@ -8,6 +8,7 @@ import { Client } from "graphql-ld";
 import { QueryEngineComunica } from "graphql-ld-comunica";
 import { QueryEngineSparqlEndpoint } from "graphql-ld-sparqlendpoint";
 import commander from "commander";
+
 QueryEngineComunica;
 interface RequestConfig {
   endpoint?: string;
@@ -36,7 +37,8 @@ app.patch("/config", async function(req, res) {
 
   let converted: ComApiConfig = {};
   if (configuration.endpoint) converted.endpoint = configuration.endpoint;
-  if (configuration.endpointType) converted.endpointType = configuration.endpointType as ComApiConfig['endpointType'];
+  if (configuration.endpointType)
+    converted.endpointType = configuration.endpointType as ComApiConfig["endpointType"];
   if (configuration.context) converted.context = configuration.context;
   if (configuration.typeDefs) converted.typeDefs = gql(configuration.typeDefs);
   // TODO validate
@@ -96,8 +98,9 @@ app.post("/query", async function(req, res) {
   // NB: don't be tempted to refactor this into isApolloQuery(query) ? apolloServer.executeOperation : comunicaServer.query
   const request = isApolloQuery(query)
     ? apolloServer.executeOperation({ query })
-    : comunicaServer.query({ query });
-
+    : comunicaServer.query({
+        query: query
+      });
   try {
     const r = await request;
     if (isApolloQuery(query)) {
@@ -115,9 +118,12 @@ app.post("/query", async function(req, res) {
     res.status(400).send(e.message);
   }
 });
-const DEFAULT_PORT=3000;
-commander.option("-p, --port <port>", "Port number, defaults to "+DEFAULT_PORT)
+const DEFAULT_PORT = 3000;
+commander.option(
+  "-p, --port <port>",
+  "Port number, defaults to " + DEFAULT_PORT
+);
 commander.parse(process.argv);
-const port = commander.port||DEFAULT_PORT;
+const port = commander.port || DEFAULT_PORT;
 app.listen(port);
-console.info("Comunica-Api listening at http://localhost:"+port);
+console.info("Comunica-Api listening at http://localhost:" + port);

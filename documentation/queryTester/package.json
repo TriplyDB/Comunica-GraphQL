@@ -1,0 +1,16 @@
+{
+  "name": "queryTester",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "graphql-to-sparql": "^2.0.2",
+    "nodemon": "^2.0.2",
+    "typescript": "^3.8.2"
+  },
+  "scripts": {
+    "dev": "yarn run build && nodemon ./build/queries.js",
+    "test": "node -r esm ./src/working_example_bag.js",
+    "build": "./node_modules/.bin/tsc"
+  }
+}

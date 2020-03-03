@@ -152,6 +152,17 @@ The configured sources can be changed easily within the source code.
 }
 ```
 
+```graphql
+{
+  getBag(bouwjaar: 1880) {
+    identificatiecode
+    bagstatus {
+      label
+    }
+  }
+}
+```
+
 ## Known limitations
 
 - Two different endpoints can not have the same queries specified in their typedefs.
