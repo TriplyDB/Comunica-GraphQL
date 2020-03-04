@@ -10,6 +10,7 @@ const typeDefs = `
       brewedBy: [brewery],
       regio: [buurt]
       getBag(bouwjaar: Int): [BAGpand]
+      test(bouwjaar: Int): [BAGpand]
   }
 
   type BAGpand  {
@@ -84,7 +85,8 @@ const context = {
     bagstatus: "http://bag.basisregistraties.overheid.nl/def/bag#status",
     identificatiecode:"http://bag.basisregistraties.overheid.nl/def/bag#identificatiecode",
     getBag: {"@reverse":"http://bag.basisregistraties.overheid.nl/def/bag#identificatiecode"},
-    regio: "https://data.pldn.nl/cbs/wijken-buurten/def/dimension#regio"
+    regio: "https://data.pldn.nl/cbs/wijken-buurten/def/dimension#regio",
+    test: "https://example.com/test"
   }
 };
 
