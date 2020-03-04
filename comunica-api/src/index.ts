@@ -7,7 +7,10 @@ import { buildFederatedSchema } from "@apollo/federation";
 import { Client } from "graphql-ld";
 import { QueryEngineComunica } from "graphql-ld-comunica";
 import { QueryEngineSparqlEndpoint } from "graphql-ld-sparqlendpoint";
+import { Converter } from "graphql-to-sparql";
+import { IVariablesDictionary } from "graphql-to-sparql";
 import commander from "commander";
+import { toSparql } from "sparqlalgebrajs";
 
 QueryEngineComunica;
 interface RequestConfig {
@@ -29,6 +32,21 @@ let config: ComApiConfig;
 const app = express();
 let apolloServer: ApolloServer;
 let comunicaServer: Client;
+
+let converter: Converter = new Converter();
+
+async function printSPARQLQuery(
+  query: string,
+  context?: { [key: string]: any },
+  variables?: IVariablesDictionary
+) {
+  const algebra = await converter.graphqlToSparqlAlgebra(
+    query,
+    context,
+    variables
+  );
+  console.info(toSparql(algebra));
+}
 
 app.use(bodyParser.json()); // for parsing application/json
 
@@ -94,12 +112,14 @@ app.post("/query", async function(req, res) {
       .send("typeDefs is not configured. Specify typeDefs at /config first.");
 
   const query = req.body.query;
+  const variablesDict: IVariablesDictionary = req.body.variables;
 
   // NB: don't be tempted to refactor this into isApolloQuery(query) ? apolloServer.executeOperation : comunicaServer.query
   const request = isApolloQuery(query)
     ? apolloServer.executeOperation({ query })
     : comunicaServer.query({
-        query: query
+        query: query,
+        variables: { variablesDict }
       });
   try {
     const r = await request;
@@ -111,6 +131,7 @@ app.post("/query", async function(req, res) {
       res.send({
         data: r.data[0]
       });
+      printSPARQLQuery(query, config.context, variablesDict);
       console.info("Query Success");
     }
   } catch (e) {

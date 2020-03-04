@@ -75,7 +75,7 @@ const typeDefs = `
   type geo0Geometry {
     geo0asWKT: [String]
   }
-`
+`;
 
 const context = {
   "@context": {
