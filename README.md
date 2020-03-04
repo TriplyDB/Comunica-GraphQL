@@ -1,29 +1,40 @@
 # GraphQL API over Linked Data sources
 
-The repository implements a GraphQL API over Linked Data. The API
-must be manually configured once and can then be used by others to
-query. It is possible to mix Linked Data backends with regular
-GraphQL backends, exposing both through the same GraphQL API.
+The repository implements a regular GraphQL API over Linked Data
+sources. The API must be manually configured once per Linked Data
+source, and can then be queried by others.
+
+Optionally, it is possible to mix Linked Data backends with regular
+GraphQL backends, and expose them through one unified GraphQL Gateway.
 
 ## Usage
 
-In order to illustrate how this GraphQL API over Linked Data sources
-works, we are going to run 3 servers:
+Exposing a Linked Data source through GraphQL currently requires
+perfoming the following two steps (in that order):
 
-### Start a Linked Data backend
+  1. Start a Comunica service.
+  2. Run a configuration script.
 
-Run the following commands to start a Linked Data backend for our
-Graph API. It will run at port 3000 by default.
-If you wish to run multiple Linked-Data backends, supply a unique port number with the `port` option.
+### Start a Comunica service
+
+Start a Comunica service with the following commands:
 
 ```sh
 cd comunica-api
 yarn
-yarn run dev #--port=3002
+yarn run dev
 ```
 
-The Linked Data backend must be configured after the linked data backend has been (re-)started.
-This is done by running the following commands:
+By default, Comunica will run on port 3000.  Use the `--port` flag to
+set a different port.
+
+### Run a configuration script
+
+Each Comunica service must be configured with one configuration
+script.  The configuration script includes the URL at which the
+Comunica service is exposed.
+
+The following commands run a configuration script:
 
 ```sh
 cd configurer
@@ -31,30 +42,52 @@ yarn
 yarn run dev
 ```
 
-### Start a normal GraphQL backend
+Running the configuration script resets the configuration of the
+corresponding Comunica service.
 
-Run the following commands to start a normal GraphQL backend. It will
-run at port 3001 by default.
-If you wish to run multiple GraphQL backends, supply a unique port number with the `port` option.
+Because service and configuration are decoupled, the GraphQL API has
+no downtime during configuration changes.
+
+## Advanced usage
+
+The above instructions explain the basic use case of running one
+GraphQL API over one Linekd Data source.
+
+This section explains to following more advanced use cases:
+
+  - Exposing multiple Linked Data sources.
+  - Mix Linked Data sources with regular GraphQL endpoints.
+  - Run a GraphQL Gateway + developer GUI
+
+### Expose multiple Linked Data sources
+
+Multiple Linked Data sources can be exposed by running multiple
+Comunica services (see above).  Each Comunica service must run on a
+different port.
+
+For each Comunica service a different configuration script must be
+run.
+
+### Mix with regular GraphQL backends
+
+In addition to Linked Data backends, you can also start zero or more
+regular GraphQL backends.
+
+This is done by running the following commands:
 
 ```sh
 cd apollo-api
 yarn
-yarn run dev #--port=3004
+yarn run dev
 ```
 
-This illustrates that we can mix Linked Data with non-Linked Data
-backends. We can start zero or more non-Linked Data backends.
+The default port for the regular GraphQL backend is 3001.  A different
+port can be specified with the `--port` flag.
 
-### Start the Gateway
+### Start a GraphQL Gateway
 
-Run the following commands to start the GraphQL API which uses the
-above started backends. It will run at port 3500, where GraphQL
-queries can now be issued over the Linked Data and non-Linked Data
-backends.
-
-If you have more than one Linked-Data backend, or more than one GraphQL-backend, or you use non-default ports for the backends (by supplying a `port` argument as described above),
-you will first need to change the list of endpoints (`serviceList`) in [apollo-gateway/src/index.ts](apollo-gateway/src/index.ts) to reflect the changes.
+Run the following commands to start a unified GraphQL Gateway over an
+arbitrary number of Linked Data and non-Linked Data backends:
 
 ```sh
 cd apollo-gateway
@@ -62,7 +95,16 @@ yarn
 yarn run dev
 ```
 
+The default port for the Gateway is 3500.  A different port can be
+specified with the `--port` flag.
+
+This list of used backens is stored in variable `serviceList` in flle
+[apollo-gateway/src/index.ts](apollo-gateway/src/index.ts).
+
 ## Source structure
+
+This sections explans the structure of the source files in this
+repository.
 
 ### Comunica source (`comunica-api`)
 
@@ -112,57 +154,73 @@ The configured sources can be changed easily within the source code.
 }
 ```
 
-### Query the non-Linked Data backend
-
-```graphql
-{
-  books {
-    author
-  }
-}
-```
-
 ### Query the Linked Data backend
 
 ```graphql
 {
-  mes {
-    name
-  }
-}
-```
-
-```graphql
-{
-  hero {
-    name
-    friends {
-      name
+  bag0hoofdadres(
+    bag0postcode:"7311KZ",
+    bag0huisnummer:110
+  ) {
+    verblijfsobject{
+      bag0oppervlakte
+      bag0pandrelatering{
+        bag0oorspronkelijkBouwjaar
+        geo0hasGeometry{geo0asWKT}
+        gebouw{
+          geo0hasGeometry{geo0asWKT}
+        }
+      }
     }
   }
 }
 ```
 
-```graphql
+```json
 {
-  hero {
-    name
-    id2
-  }
-}
-```
-
-```graphql
-{
-  getBag(bouwjaar: 1880) {
-    identificatiecode
-    bagstatus {
-      label
-    }
+  "data": {
+    "bag0hoofdadres": [
+      {
+        "verblijfsobject": [
+          {
+            "bag0oppervlakte": [
+              8870
+            ],
+            "bag0pandrelatering": [
+              {
+                "bag0oorspronkelijkBouwjaar": [
+                  1982
+                ],
+                "geo0hasGeometry": [
+                  {
+                    "geo0asWKT": [
+                      "POLYGON((5.962296605 52.212026196,5.962124204 52.211948229,5.962208274 52.211816531,5.962341019 52.211608612,5.962427406 52.211629295,5.962401366 52.211670336,5.96243599 52.211678759,5.962482474 52.211640208,5.962541463 52.211667046,5.96266271 52.211722217,5.962618977 52.211758472,5.962510659 52.211849015,5.962326577 52.212001809,5.962305394 52.212019044,5.962296605 52.212026196))"
+                    ]
+                  }
+                ],
+                "gebouw": [
+                  {
+                    "geo0hasGeometry": [
+                      {
+                        "geo0asWKT": [
+                          "POLYGON((5.962481413 52.211850344,5.962277515 52.212019746,5.962101416 52.211939774,5.962470588 52.211633049,5.962644906 52.21171222,5.962569254 52.211775082,5.962593376 52.211786037,5.962503755 52.21186049,5.962481413 52.211850344))",
+                          "POLYGON((5.962336701 52.211611923,5.96243663 52.211633169,5.962411859 52.211681843,5.962196424 52.211860837,5.962336701 52.211611923))"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
   }
 }
 ```
 
 ## Known limitations
 
-- Two different endpoints can not have the same queries specified in their typedefs.
+- Two different backends that are exposed through the cannot have the
+  same queries specified in their type definitions.

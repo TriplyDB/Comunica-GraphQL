@@ -1,92 +1,121 @@
 import * as superagent from "superagent";
 
-const endpoint =
- "https://api.labs.kadaster.nl/datasets/kadaster/knowledge-graph/services/knowledge-graph/sparql";
- const endpointType = "SPARQL";
-//const endpoint = "https://api.labs.kadaster.nl/datasets/kadaster/knowledge-graph/fragments";
-//const endpointType = "fragments";
+const endpoint = "https://api.labs.kadaster.nl/datasets/kadaster/knowledge-graph/services/knowledge-graph/sparql";
+const endpointType = "SPARQL";
 const typeDefs = `
   type Query  {
-      brewedBy: [brewery],
-      regio: [buurt]
-      getBag(bouwjaar: Int): [BAGpand]
-      test(bouwjaar: Int): [BAGpand]
+    bag0bijbehorendeOpenbareRuimte(bag0identificatiecode: String, bag0naamOpenbareRuimte: String): [bag0OpenbareRuimte]
+    bag0bijbehorendeWoonplaats(bag0identificatiecode: String, bag0naamWoonplaats: String): [bag0Woonplaats]
+    bag0hoofdadres(bag0huisletter: String, bag0huisnummer: Int, bag0huisnummertoevoeging: String, bag0identificatiecode: String, bag0postcode: String): [bag0Nummeraanduiding]
+    bag0nevenadres(bag0huisletter: String, bag0huisnummer: Int, bag0huisnummertoevoeging: String, bag0identificatiecode: String, bag0postcode: String): [bag0Nummeraanduiding]
+    bag0pandrelatering(bag0oorspronkelijkBouwjaar: Int): [bag0Pand]
   }
 
-  type BAGpand  {
-    identificatiecode: [String]
-    bagstatus: [Label]
-    bouwjaar: Int
-    }
-
-  type Label {
-    label: [String]
+  type bag0Pand  {
+    bag0identificatiecode: [String]
+    bag0oorspronkelijkBouwjaar: [Int]
+    bag0status: [bag0Status]
+    bag0verblijfsobject: [bag0Verblijfsobject]
+    geo0hasGeometry: [geo0Geometry]
+    gebouw: [brt0Gebouw]
   }
 
-  type buurt {
-    hasGeometry: [geometery],
-    sfWithin: [wijk],
-    label: [String],
-    regioCode: [String]
+  type bag0Nummeraanduiding {
+    bag0bijbehorendeOpenbareRuimte: [bag0OpenbareRuimte]
+    bag0huisletter: [String]
+    bag0huisnummer: [Int]
+    bag0huisnummertoevoeging: [String]
+    bag0identificatiecode: [String]
+    bag0postcode: [String]
+    bag0status: [bag0Status]
+    verblijfsobject: [bag0Verblijfsobject]
   }
 
-  type geometery {
-    asWKT: [String]
+  type bag0OpenbareRuimte {
+    bag0bijbehorendeWoonplaats: [bag0Woonplaats]
+    bag0identificatiecode: [String]
+    bag0naamOpenbareRuimte: [String]
+    bag0status: [bag0Status]
   }
 
-  type wijk {
-    hasGeometry: [geometery],
-    sfWithin: [gemeente],
-    label: [String],
-    regioCode: [String]
+  type bag0Status {
+    dct0source: [String]
+    rdfs0label: [String]
+    skos0broader: [bag0Status]
+    skos0definition: [String]
   }
 
-  type gemeente {
-    hasGeometry: [geometery],
-    sfWithin: [land],
-    label: [String],
-    regioCode: [String]
+  type bag0Verblijfsobject {
+    bag0hoofdadres: [bag0Nummeraanduiding]
+    bag0nevenadres: [bag0Nummeraanduiding]
+    bag0identificatiecode: [String]
+    bag0oppervlakte: [Int]
+    bag0pandrelatering: [bag0Pand]
+    bag0status: [bag0Status]
+    geo0hasGeometry: [geo0Geometry]
   }
 
-  type land {
-    hasGeometry: [geometery],
-    label: [String],
-    regioCode: [String]
+  type bag0Woonplaats {
+    bag0identificatiecode: [String]
+    bag0naamWoonplaats: [String]
+    bag0status: [bag0Status]
+    geo0hasGeometry: [geo0Geometry]
   }
 
+  type brt0Gebouw {
+    brt0bronactualiteit: [String]
+    brt0bronnauwkeurigheid: [Float]
+    brt0hoogteniveau: [Int]
+    brt0objectBeginTijd: [String]
+    brt0tijdstipRegistratie: [String]
+    geo0hasGeometry: [geo0Geometry]
+    geo0sfOverlaps: [bag0Pand]
+  }
 
-  type brewery {
-    address: [Address],
-    email: [String],
-    jaarproduktie: [String]
+  type geo0Geometry {
+    geo0asWKT: [String]
   }
-  type Address {
-    addressLocality: [String],
-    postalCode: [String]
-    streetAddress: [String]
-  }
-  `;
+`
 
 const context = {
   "@context": {
-    brewedBy: "https://data.labs.kadaster.nl/dbeerpedia/dbeerpedia/vocab/brewedby",
-    address: "http://schema.org/address",
-    email: "http://schema.org/email",
-    opgericht: "https://data.labs.kadaster.nl/dbeerpedia/dbeerpedia/vocab/jaarproduktie",
-    addressLocality: "http://schema.org/addressLocality",
-    postalCode: "http://schema.org/postalCode",
-    streetAddress: "http://schema.org/streetAddress",
-    hasGeometry: "http://schema.org/addressLocality",
-    sfWithin: "http://schema.org/addressLocality",
-    bouwjaar:"http://bag.basisregistraties.overheid.nl/def/bag#oorspronkelijkBouwjaar",
-    asWKT: "http://www.opengis.net/ont/geosparql#asWKT",
-    label: "http://www.w3.org/2000/01/rdf-schema#label",
-    regioCode: "https://data.pldn.nl/cbs/wijken-buurten/def/cbs#regiocode",
-    bagstatus: "http://bag.basisregistraties.overheid.nl/def/bag#status",
-    identificatiecode:"http://bag.basisregistraties.overheid.nl/def/bag#identificatiecode",
-    getBag: {"@reverse":"http://bag.basisregistraties.overheid.nl/def/bag#identificatiecode"},
-    regio: "https://data.pldn.nl/cbs/wijken-buurten/def/dimension#regio",
-    test: "https://example.com/test"
+    gebouw: {"@reverse": "http://www.opengis.net/ont/geosparql#sfOverlaps" },
+    verblijfsobject: {"@reverse": "http://bag.basisregistraties.overheid.nl/def/bag#hoofdadres"},
+    "bag0Nummeraanduiding": "http://bag.basisregistraties.overheid.nl/def/bag#Nummeraanduiding",
+    "bag0OpenbareRuimte": "http://bag.basisregistraties.overheid.nl/def/bag#OpenbareRuimte",
+    "bag0Pand": "http://bag.basisregistraties.overheid.nl/def/bag#Pand",
+    "bag0Status": "http://bag.basisregistraties.overheid.nl/def/bag#Status",
+    "bag0Verblijfsobject": "http://bag.basisregistraties.overheid.nl/def/bag#Verblijfsobject",
+    "bag0Woonplaats": "http://bag.basisregistraties.overheid.nl/def/bag#Woonplaats",
+    "bag0bijbehorendeOpenbareRuimte": "http://bag.basisregistraties.overheid.nl/def/bag#bijbehorendeOpenbareRuimte",
+    "bag0bijbehorendeWoonplaats": "http://bag.basisregistraties.overheid.nl/def/bag#bijbehorendeWoonplaats",
+    "bag0hoofdadres": "http://bag.basisregistraties.overheid.nl/def/bag#hoofdadres",
+    "bag0huisletter": "http://bag.basisregistraties.overheid.nl/def/bag#huisletter",
+    "bag0huisnummer": "http://bag.basisregistraties.overheid.nl/def/bag#huisnummer",
+    "bag0huisnummertoevoeging": "http://bag.basisregistraties.overheid.nl/def/bag#huisnummertoevoeging",
+    "bag0identificatiecode": "http://bag.basisregistraties.overheid.nl/def/bag#identificatiecode",
+    "bag0naamOpenbareRuimte": "http://bag.basisregistraties.overheid.nl/def/bag#naamOpenbareRuimte",
+    "bag0nevenadres": "http://bag.basisregistraties.overheid.nl/def/bag#nevenadres",
+    "bag0oorspronkelijkBouwjaar": "http://bag.basisregistraties.overheid.nl/def/bag#oorspronkelijkBouwjaar",
+    "bag0oppervlakte": "http://bag.basisregistraties.overheid.nl/def/bag#oppervlakte",
+    "bag0pandrelatering": "http://bag.basisregistraties.overheid.nl/def/bag#pandrelatering",
+    "bag0postcode": "http://bag.basisregistraties.overheid.nl/def/bag#postcode",
+    "bag0status": "http://bag.basisregistraties.overheid.nl/def/bag#status",
+    "bag0verblijfsobject": {"@reverse": "http://bag.basisregistraties.overheid.nl/def/bag#gerelateerdPand"},
+    "brt0Gebouw": "http://brt.basisregistraties.overheid.nl/def/top10nl#Gebouw",
+    "brt0bronactualiteit": "http://brt.basisregistraties.overheid.nl/def/top10nl#bronactualiteit",
+    "brt0bronnauwkeurigheid": "http://brt.basisregistraties.overheid.nl/def/top10nl#bronnauwkeurigheid",
+    "brt0hoogteniveau": "http://brt.basisregistraties.overheid.nl/def/top10nl#hoogteniveau",
+    "brt0objectBeginTijd": "http://brt.basisregistraties.overheid.nl/def/top10nl#objectBeginTijd",
+    "brt0tijdstipRegistratie": "http://brt.basisregistraties.overheid.nl/def/top10nl#tijdstipRegistratie",
+    "dct0source": "http://purl.org/dc/terms/source",
+    "geo0Geometry": "http://www.opengis.net/ont/geosparql#Geometry",
+    "geo0asWKT": "http://www.opengis.net/ont/geosparql#asWKT",
+    "geo0hasGeometry": "http://www.opengis.net/ont/geosparql#hasGeometry",
+    "geo0sfOverlaps": "http://www.opengis.net/ont/geosparql#sfOverlaps",
+    "rdfs0label": "http://www.w3.org/2000/01/rdf-schema#label",
+    "skos0broaser": "http://www.w3.org/2004/02/skos/core#broader",
+    "skos0definition": "http://www.w3.org/2004/02/skos/core#definition"
   }
 };
 
