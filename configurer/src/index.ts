@@ -17,7 +17,8 @@ const typeDefs = `
     bag0status: [bag0Status]
     bag0verblijfsobject: [bag0Verblijfsobject]
     geo0hasGeometry: [geo0Geometry]
-    gebouw: [brt0Gebouw]
+    brt0bijbehoordGebouw: [brt0Gebouw]
+    geo0sfWithin: [cbs0Buurt]
   }
 
   type bag0Nummeraanduiding {
@@ -75,11 +76,42 @@ const typeDefs = `
   type geo0Geometry {
     geo0asWKT: [String]
   }
+
+  type cbs0Buurt{
+    rdfs0label: [String]
+    owl0sameAs: [cbs02016Buurt]
+    geo0sfWithin: [cbs0Wijk]
+  }
+
+  type cbs0Wijk{
+    rdfs0label: [String]
+    owl0sameAs: [cbs02016Wijk]
+    geo0sfWithin: [cbs0Gemeente]
+  }
+
+  type cbs0Gemeente{
+    rdfs0label: [String]
+    owl0sameAs: [cbs02016Gemeente]
+  }
+
+  type cbs02016Buurt{
+    geo0hasGeometry: [geo0Geometry]
+  }
+
+  type cbs02016Wijk{
+    geo0hasGeometry: [geo0Geometry]
+  }
+
+  type cbs02016Gemeente{
+    geo0hasGeometry: [geo0Geometry]
+  }
+
+
 `;
 
 const context = {
   "@context": {
-    gebouw: {"@reverse": "http://www.opengis.net/ont/geosparql#sfOverlaps" },
+    brt0bijbehoordGebouw: {"@reverse": "http://www.opengis.net/ont/geosparql#sfOverlaps" },
     verblijfsobject: {"@reverse": "http://bag.basisregistraties.overheid.nl/def/bag#hoofdadres"},
     "bag0Nummeraanduiding": "http://bag.basisregistraties.overheid.nl/def/bag#Nummeraanduiding",
     "bag0OpenbareRuimte": "http://bag.basisregistraties.overheid.nl/def/bag#OpenbareRuimte",
@@ -113,9 +145,11 @@ const context = {
     "geo0asWKT": "http://www.opengis.net/ont/geosparql#asWKT",
     "geo0hasGeometry": "http://www.opengis.net/ont/geosparql#hasGeometry",
     "geo0sfOverlaps": "http://www.opengis.net/ont/geosparql#sfOverlaps",
+    "geo0sfWithin": "http://www.opengis.net/ont/geosparql#sfWithin",
     "rdfs0label": "http://www.w3.org/2000/01/rdf-schema#label",
     "skos0broaser": "http://www.w3.org/2004/02/skos/core#broader",
-    "skos0definition": "http://www.w3.org/2004/02/skos/core#definition"
+    "skos0definition": "http://www.w3.org/2004/02/skos/core#definition",
+    "owl0sameAs" : "http://www.w3.org/2002/07/owl#sameAs"
   }
 };
 
