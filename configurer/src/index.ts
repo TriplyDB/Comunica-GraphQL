@@ -8,7 +8,7 @@ const typeDefs = `
     bag0bijbehorendeWoonplaats(bag0identificatiecode: String, bag0naamWoonplaats: String): [bag0Woonplaats]
     bag0hoofdadres(bag0huisletter: String, bag0huisnummer: Int, bag0huisnummertoevoeging: String, bag0identificatiecode: String, bag0postcode: String): [bag0Nummeraanduiding]
     bag0nevenadres(bag0huisletter: String, bag0huisnummer: Int, bag0huisnummertoevoeging: String, bag0identificatiecode: String, bag0postcode: String): [bag0Nummeraanduiding]
-    bag0pandrelatering(bag0oorspronkelijkBouwjaar: Int): [bag0Pand]
+    bag0pandrelatering(bag0oorspronkelijkBouwjaar: Int,  bag0identificatiecode: String): [bag0Pand]
   }
 
   type bag0Pand  {

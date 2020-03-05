@@ -167,7 +167,7 @@ The configured sources can be changed easily within the source code.
       bag0pandrelatering{
         bag0oorspronkelijkBouwjaar
         geo0hasGeometry{geo0asWKT}
-        gebouw{
+        brt0bijbehoordGebouw{
           geo0hasGeometry{geo0asWKT}
         }
       }
@@ -219,6 +219,144 @@ The configured sources can be changed easily within the source code.
   }
 }
 ```
+Two queries that shouw how the BAG is connected to the CBS data set.
+```GraphQL
+{
+  bag0hoofdadres(bag0postcode:"1091VA", bag0huisnummer:255){
+    verblijfsobject{
+      bag0oppervlakte
+      bag0status{
+        rdfs0label
+      }
+      bag0pandrelatering{
+        bag0oorspronkelijkBouwjaar
+        bag0identificatiecode
+        geo0sfWithin{
+          rdfs0label
+          geo0sfWithin{
+            rdfs0label
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+```JSON
+{
+  "data": {
+    "bag0hoofdadres": [
+      {
+        "verblijfsobject": [
+          {
+            "bag0oppervlakte": [
+              50,
+              53,
+              80
+            ],
+            "bag0status": [
+              {
+                "rdfs0label": [
+                  "Verblijfsobject in gebruik (status verblijfsobject)"
+                ]
+              }
+            ],
+            "bag0pandrelatering": [
+              {
+                "bag0oorspronkelijkBouwjaar": [
+                  1902
+                ],
+                "bag0identificatiecode": [
+                  "0363100012165404"
+                ],
+                "geo0sfWithin": [
+                  {
+                    "rdfs0label": [
+                      "Oosterparkbuurt Zuidwest"
+                    ],
+                    "geo0sfWithin": [
+                      {
+                        "rdfs0label": [
+                          "Oosterparkbuurt"
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+```graphql
+{
+  bag0pandrelatering(bag0identificatiecode: "0363100012165404"){
+    geo0sfWithin{
+      rdfs0label
+      geo0sfWithin{
+        rdfs0label
+        geo0sfWithin{
+          rdfs0label
+          owl0sameAs{
+            geo0hasGeometry{
+              geo0asWKT
+            }
+          }
+        }
+      }
+    }
+  }
+}
+```
+
+```json
+{
+  "data": {
+    "bag0pandrelatering": [
+      {
+        "geo0sfWithin": [
+          {
+            "rdfs0label": [
+              "Oosterparkbuurt Zuidwest"
+            ],
+            "geo0sfWithin": [
+              {
+                "rdfs0label": [
+                  "Oosterparkbuurt"
+                ],
+                "geo0sfWithin": [
+                  {
+                    "rdfs0label": [
+                      "Amsterdam"
+                    ],
+                    "owl0sameAs": [
+                      {
+                        "geo0hasGeometry": [
+                          {
+                            "geo0asWKT": [
+                              "MULTIPOLYGON(((4.9806828979168 52.33076108613,4.9808593115408 52.330761161751
+                              ...
+                            ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+}
+```
+
 
 ## Known limitations
 
