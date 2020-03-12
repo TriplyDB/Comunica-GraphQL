@@ -356,6 +356,25 @@ Two queries that shouw how the BAG is connected to the CBS data set.
 }
 }
 ```
+## Extend functionality
+To be able to be used in a federated setting, we need to be able to use the extend keyword in our schemas/typeDefs. Currently, this does not work out of the box yet. For instance if we start the comunica-api (load these with the configurator), apollo-api and then the apollo-gateway, the following query is syntactically accepted, but it is not resolved properly:
+
+```graphql
+{
+  bagTest{
+    pandkey
+    status
+    gerelateerdBRTgebouw{
+      brt0hoogteniveau
+    }
+  }
+}
+```
+
+It is possible that the sub query that goes to the Express server and does not get redirected to the comunica module(properly)
+
+
+
 
 
 ## Known limitations
