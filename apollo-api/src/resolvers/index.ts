@@ -1,18 +1,18 @@
 // Resolvers define the technique for fetching the types defined in the
 // schema. This resolver retrieves books from the "books" array above.
-const books = [
+const Panden = [
   {
-    title: "Harry Potter and the Chamber of Secrets",
-    author: "J.K. Rowling"
+    pandkey: "0363100012165404",
+    status: "Actief"
   },
   {
-    title: "Jurassic Park",
-    author: "Michael Crichton"
+    pandkey: "0307100000342331",
+    status: "Actief"
   }
 ];
 
 export const resolvers = {
   Query: {
-    books: () => books
+    bagTest: () => Panden
   }
 };
