@@ -11,9 +11,11 @@ const typeDefs = `
     bag0pandrelatering(bag0oorspronkelijkBouwjaar: Int,  bag0identificatiecode: String): [bag0Pand]
   }
 
-  extend type BAGPND @key(fields: "pandkey"){
+  extend type BAGPND @key(fields: "pandkey") @external{
       pandkey: String @external
       gerelateerdBRTgebouw: [brt0Gebouw]
+      bag0huisletter: [String]
+      bag0huisnummer: [Int]
   }
 
   type bag0Pand  {
