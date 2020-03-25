@@ -1,16 +1,14 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { GraphQLSchema, DocumentNode } from "graphql";
-import { isApolloQuery } from "./introspection-detector";
+import { isApolloQuery, isExtendQuery } from "./introspection-detector";
+import { communicaExtendQuery } from "./middlewares/communicaExtendQuery";
 import { ApolloServer, gql, Config } from "apollo-server-express";
 import { buildFederatedSchema } from "@apollo/federation";
 import { Client } from "graphql-ld";
 import { QueryEngineComunica } from "graphql-ld-comunica";
 import { QueryEngineSparqlEndpoint } from "graphql-ld-sparqlendpoint";
-import { Converter } from "graphql-to-sparql";
-import { IVariablesDictionary } from "graphql-to-sparql";
 import commander from "commander";
-import { toSparql } from "sparqlalgebrajs";
 
 QueryEngineComunica;
 interface RequestConfig {
@@ -32,21 +30,6 @@ let config: ComApiConfig;
 const app = express();
 let apolloServer: ApolloServer;
 let comunicaServer: Client;
-
-let converter: Converter = new Converter();
-
-async function printSPARQLQuery(
-  query: string,
-  context?: { [key: string]: any },
-  variables?: IVariablesDictionary
-) {
-  const algebra = await converter.graphqlToSparqlAlgebra(
-    query,
-    context,
-    variables
-  );
-  console.info(toSparql(algebra));
-}
 
 app.use(bodyParser.json()); // for parsing application/json
 
@@ -112,32 +95,50 @@ app.post("/query", async function(req, res) {
       .send("typeDefs is not configured. Specify typeDefs at /config first.");
 
   const query = req.body.query;
-  const variablesDict: IVariablesDictionary = req.body.variables;
-
+  const variables = req.body.variables;
   // NB: don't be tempted to refactor this into isApolloQuery(query) ? apolloServer.executeOperation : comunicaServer.query
-  const request = isApolloQuery(query)
-    ? apolloServer.executeOperation({ query })
-    : comunicaServer.query({
-        query: query,
-        variables: { variablesDict }
-      });
-  try {
-    const r = await request;
-    if (isApolloQuery(query)) {
-      res.send(r);
-      console.info("Introspection Succes");
-    } else {
-      console.info(JSON.stringify(r, null, 2));
-      res.send({
-        data: r.data[0]
-      });
-      printSPARQLQuery(query, config.context, variablesDict);
-      console.info("Query Success");
-    }
-  } catch (e) {
-    console.error("Error:", e);
-    res.status(400).send(e.message);
+  let request: Promise<any>;
+  if (isApolloQuery(query)) {
+    request = apolloServer.executeOperation({ query });
+  } else if (isExtendQuery(query)) {
+    request = comunicaServer.query(
+      await communicaExtendQuery(query, config.context, variables)
+    );
+  } else {
+    request = comunicaServer.query({
+      query: query
+    });
   }
+  (request as Promise<any>)
+    .then((r: any) => {
+      if (isApolloQuery(query)) {
+        res.send(r);
+        console.info("Introspection Succes");
+      } else if (isExtendQuery(query)) {
+        const results = {
+          data: {
+            _entities: r.data[0][""][0]["entities"]
+          }
+        };
+
+        console.info(JSON.stringify(results, null, 2));
+
+        res.send(results);
+        console.info("Extend query Success");
+      } else {
+        console.info(JSON.stringify(r, null, 2));
+
+        res.send({
+          data: r.data[0]
+        });
+
+        console.info("Query Success");
+      }
+    })
+    .catch(e => {
+      console.error("Error:", e);
+      res.status(400).send(e.message);
+    });
 });
 const DEFAULT_PORT = 3000;
 commander.option(
