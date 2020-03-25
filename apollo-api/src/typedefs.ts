@@ -5,9 +5,10 @@ import { gql } from "apollo-server";
 export const typeDefs = gql`
   # Comments in GraphQL strings (such as this one) start with the hash (#) symbol.
 
-  type BAGPND @key(fields: "pandkey"){
-        pandkey: String
+  type BAGPND @key(fields: "bag0identificatiecode"){
+        bag0identificatiecode: String
         status: String
+        WaterstofGebruik: String
     }
 
   # The "Query" type is special: it lists all of the available queries that

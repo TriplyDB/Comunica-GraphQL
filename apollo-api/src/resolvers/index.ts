@@ -3,11 +3,13 @@
 const Panden = [
   {
     pandkey: "0363100012165404",
-    status: "Actief"
+    status: "Actief",
+    WaterstofGebruik: "101"
   },
   {
     pandkey: "0307100000342331",
-    status: "Actief"
+    status: "Actief",
+    WaterstofGebruik: "102"
   }
 ];
 
