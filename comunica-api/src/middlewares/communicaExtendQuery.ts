@@ -1,5 +1,4 @@
 import { toSparql } from "sparqlalgebrajs";
-import { literal, namedNode, variable } from "@rdfjs/data-model";
 import { Converter } from "graphql-to-sparql";
 import * as RDF from "rdf-js";
 import { IVariablesDictionary } from "graphql-to-sparql";
@@ -23,15 +22,15 @@ export async function printSPARQLQuery(
 function retrieveDatatype(value: any): RDF.NamedNode {
   const type = typeof value;
   if (type === "string") {
-    return namedNode("http://www.w3.org/2001/XMLSchema#string");
+    return DataFactory.namedNode("http://www.w3.org/2001/XMLSchema#string");
   } else if (type === "boolean") {
-    return namedNode("http://www.w3.org/2001/XMLSchema#boolean");
+    return DataFactory.namedNode("http://www.w3.org/2001/XMLSchema#boolean");
   } else if (type === "bigint") {
-    return namedNode("http://www.w3.org/2001/XMLSchema#integer");
+    return DataFactory.namedNode("http://www.w3.org/2001/XMLSchema#integer");
   } else if (type === "number" && Number.isInteger(value)) {
-    return namedNode("http://www.w3.org/2001/XMLSchema#integer");
+    return DataFactory.namedNode("http://www.w3.org/2001/XMLSchema#integer");
   } else if (type === "number") {
-    return namedNode("http://www.w3.org/2001/XMLSchema#float");
+    return DataFactory.namedNode("http://www.w3.org/2001/XMLSchema#float");
   }
 }
 
@@ -68,7 +67,7 @@ export async function communicaExtendQuery(
 
   const sparqlAlgebraCommunica = await communicaQuery(query, context);
 
-  // GENERATION OF VALUES CLAUSE
+  // GENERATION OF variables bgp
   const valuesBgp = Object.keys(variables.representations[0])
     .map((key: string) => {
       if (key !== "__typename") {
@@ -81,13 +80,16 @@ export async function communicaExtendQuery(
       }
     })
     .filter(x => x);
+
+  // GENERATION OF VALUES CLAUSE
   const variablesBinding = Object.keys(variables.representations[0])
     .map((key: string) => {
       if (key !== "__typename") {
-        return variable("representations_" + key);
+        return DataFactory.variable("representations_" + key);
       }
     })
     .filter(x => x);
+
   const valueBindings = variables.representations.map(
     (variable: { [key: string]: any }) => {
       return Object.keys(variable)
@@ -96,14 +98,17 @@ export async function communicaExtendQuery(
             const value = variable[key];
             if (context["@context"][value]) {
               return {
-                [`?representations_${key}`]: namedNode(
+                [`?representations_${key}`]: DataFactory.namedNode(
                   context["@context"][value]
                 )
               };
             } else {
               const datatype = retrieveDatatype(value);
               return {
-                [`?representations_${key}`]: literal("" + value, datatype)
+                [`?representations_${key}`]: DataFactory.literal(
+                  "" + value,
+                  datatype
+                )
               };
             }
           }
@@ -115,6 +120,7 @@ export async function communicaExtendQuery(
         }, {});
     }
   );
+
   //CONTRUCTION OF COMBINED VALUES CLAUSE WITH SPARQL
   const sparqlAlgebra = OperationFactory.createProject(
     OperationFactory.createJoin(
