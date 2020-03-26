@@ -101,7 +101,6 @@ export async function communicaExtendQuery(
     ),
     sparqlAlgebraCommunica.variables
   );
-  console.info(toSparql(sparqlAlgebra));
   return {
     sparqlAlgebra: sparqlAlgebra,
     singularizeVariables: {}
