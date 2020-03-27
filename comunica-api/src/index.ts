@@ -12,9 +12,20 @@ import { QueryEngineSparqlEndpoint } from "graphql-ld-sparqlendpoint";
 import commander from "commander";
 import { GraphQLResponse } from "apollo-server-types";
 
-const DEBUG = true;
+const DEFAULT_PORT = 3000;
+commander.option(
+  "-p, --port <port>",
+  "Port number, defaults to " + DEFAULT_PORT
+);
+commander.option(
+  "-v, --verbose",
+  "Verbose logging"
+);
+commander.parse(process.argv);
+const port = commander.port || DEFAULT_PORT;
+
 function log(...args:any[]){
-  if (DEBUG) console.log(args);
+  if (commander.verbose) console.log(args);
 }
 
 interface RequestConfig {
@@ -136,12 +147,5 @@ app.post("/query", function(req, res) {
       res.status(400).send(e.message);
     });
 });
-const DEFAULT_PORT = 3000;
-commander.option(
-  "-p, --port <port>",
-  "Port number, defaults to " + DEFAULT_PORT
-);
-commander.parse(process.argv);
-const port = commander.port || DEFAULT_PORT;
 app.listen(port);
 console.info("Comunica-Api listening at http://localhost:" + port);
