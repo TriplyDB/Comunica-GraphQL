@@ -1,11 +1,10 @@
-import * as chai from "chai";
+import {expect} from "chai";
 
 import * as DataFactory from "@rdfjs/data-model";
 import { Factory } from "sparqlalgebrajs";
 import { communicaExtendQuery } from "../middlewares/communicaExtendQuery";
 import { gql } from "apollo-server";
 
-var expect = chai.expect;
 const OperationFactory = new Factory(DataFactory);
 
 describe("Converter", () => {

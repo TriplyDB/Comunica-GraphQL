@@ -1,16 +1,22 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { GraphQLSchema, DocumentNode } from "graphql";
+import {ExecutionResult} from "graphql/execution";
 import { isApolloQuery, isExtendQuery } from "./introspection-detector";
 import { communicaExtendQuery } from "./middlewares/communicaExtendQuery";
 import { ApolloServer, gql, Config } from "apollo-server-express";
 import { buildFederatedSchema } from "@apollo/federation";
-import { Client } from "graphql-ld";
+import { Client as GraphQLClient } from "graphql-ld";
 import { QueryEngineComunica } from "graphql-ld-comunica";
 import { QueryEngineSparqlEndpoint } from "graphql-ld-sparqlendpoint";
 import commander from "commander";
+import { GraphQLResponse } from "apollo-server-types";
 
-QueryEngineComunica;
+const DEBUG = true;
+function log(...args:any[]){
+  if (DEBUG) console.log(args);
+}
+
 interface RequestConfig {
   endpoint?: string;
   endpointType?: string;
@@ -29,32 +35,32 @@ interface ComApiConfig {
 let config: ComApiConfig;
 const app = express();
 let apolloServer: ApolloServer;
-let comunicaServer: Client;
+let comunicaServer: GraphQLClient;
 
 app.use(bodyParser.json()); // for parsing application/json
 
-app.patch("/config", async function(req, res) {
-  const configuration: RequestConfig = req.body;
+app.patch("/config", function(req, res) {
+  const configArgs: RequestConfig = req.body;
 
-  let converted: ComApiConfig = {};
-  if (configuration.endpoint) converted.endpoint = configuration.endpoint;
-  if (configuration.endpointType)
-    converted.endpointType = configuration.endpointType as ComApiConfig["endpointType"];
-  if (configuration.context) converted.context = configuration.context;
-  if (configuration.typeDefs) converted.typeDefs = gql(configuration.typeDefs);
-  // TODO validate
-  config = { ...(config ? config : {}), ...converted };
+  let curatedConfig: ComApiConfig = {};
 
-  const schema = buildFederatedSchema({ typeDefs: config.typeDefs });
-  const APOLLO_SERVER: Config = { schema };
-  apolloServer = new ApolloServer(APOLLO_SERVER);
+  if (configArgs.endpoint) curatedConfig.endpoint = configArgs.endpoint;
+  if (configArgs.endpointType) curatedConfig.endpointType = configArgs.endpointType as ComApiConfig["endpointType"];
+  if (configArgs.context) curatedConfig.context = configArgs.context;
+  if (configArgs.typeDefs) curatedConfig.typeDefs = gql(configArgs.typeDefs);
+  // TODO validate further
+
+  config = { ...(config || {}), ...curatedConfig };
+
+  apolloServer = new ApolloServer(<Config>{ schema:buildFederatedSchema({ typeDefs: config.typeDefs }) });
+
   if (config.endpointType === "SPARQL") {
-    comunicaServer = new Client({
+    comunicaServer = new GraphQLClient({
       context: config.context,
       queryEngine: new QueryEngineSparqlEndpoint(config.endpoint)
     });
   } else if (config.endpointType === "fragments") {
-    comunicaServer = new Client({
+    comunicaServer = new GraphQLClient({
       context: config.context,
       queryEngine: new QueryEngineComunica({
         sources: [{ type: "hypermedia", value: config.endpoint }]
@@ -64,21 +70,21 @@ app.patch("/config", async function(req, res) {
     return res
       .status(400)
       .send(
-        "endpoint type is not configured. Specify endpointType at /config first."
+        "endpoint type is not configured. Please specify endpointType."
       );
   }
-  console.info("Successfully configured");
-  res.sendStatus(200);
-  console.info(config.endpoint);
+  log("Successfully configured");
+  res.status(200).send("Successfully configured");
+  log(config.endpoint);
 });
 
 // Setting up the post request which we use to pass the arguments to Comunica
-app.post("/query", async function(req, res) {
+app.post("/query", function(req, res) {
   if (!config) {
     return res
       .status(400)
       .send(
-        "Server is not configured. Specify {endpoint, typedef, context} at /config first."
+        "Server is not configured. Specify {endpoint, typeDefs, context} at /config first."
       );
   }
   if (!config.context)
@@ -97,46 +103,36 @@ app.post("/query", async function(req, res) {
   const query = req.body.query;
   const variables = req.body.variables;
   // NB: don't be tempted to refactor this into isApolloQuery(query) ? apolloServer.executeOperation : comunicaServer.query
-  let request: Promise<any>;
+  let request: Promise<GraphQLResponse|ExecutionResult<any>>;
   if (isApolloQuery(query)) {
     request = apolloServer.executeOperation({ query });
   } else if (isExtendQuery(query)) {
-    request = comunicaServer.query(
-      await communicaExtendQuery(query, config.context, variables)
-    );
+    request = communicaExtendQuery(query, config.context, variables).then(comunicaServer.query);
   } else {
-    request = comunicaServer.query({
-      query: query
-    });
+    request = comunicaServer.query({query: query});
   }
-  (request as Promise<any>)
-    .then((r: any) => {
+  request
+    .then((r) => {
       if (isApolloQuery(query)) {
         res.send(r);
-        console.info("Introspection Succes");
+        log("Introspection Succes");
       } else if (isExtendQuery(query)) {
         const results = {
           data: {
             _entities: r.data[0][""][0]["entities"]
           }
         };
-
-        console.info(JSON.stringify(results, null, 2));
-
+        log(JSON.stringify(results, null, 2));
         res.send(results);
-        console.info("Extend query Success");
+        log("Extend query Success");
       } else {
-        console.info(JSON.stringify(r, null, 2));
-
-        res.send({
-          data: r.data[0]
-        });
-
-        console.info("Query Success");
+        log(JSON.stringify(r, null, 2));
+        res.send({data: r.data[0]});
+        log("Query Success");
       }
     })
     .catch(e => {
-      console.error("Error:", e);
+      log("Error:", e);
       res.status(400).send(e.message);
     });
 });
