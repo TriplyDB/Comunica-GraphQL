@@ -11,6 +11,8 @@ import { QueryEngineComunica } from "graphql-ld-comunica";
 import { QueryEngineSparqlEndpoint } from "graphql-ld-sparqlendpoint";
 import commander from "commander";
 import { GraphQLResponse } from "apollo-server-types";
+import { Algebra } from "sparqlalgebrajs";
+import { ISingularizeVariables } from "graphql-to-sparql/lib/IConvertContext";
 
 const DEFAULT_PORT = 3000;
 commander.option(
@@ -25,7 +27,7 @@ commander.parse(process.argv);
 const port = commander.port || DEFAULT_PORT;
 
 function log(...args:any[]){
-  if (commander.verbose) console.log(args);
+   console.log(args);
 }
 
 interface RequestConfig {
@@ -118,7 +120,8 @@ app.post("/query", function(req, res) {
   if (isApolloQuery(query)) {
     request = apolloServer.executeOperation({ query });
   } else if (isExtendQuery(query)) {
-    request = communicaExtendQuery(query, config.context, variables).then(comunicaServer.query);
+    request = communicaExtendQuery(query, config.context, variables).then(
+      (value: {sparqlAlgebra: Algebra.Operation; singularizeVariables: ISingularizeVariables }) => comunicaServer.query(value));
   } else {
     request = comunicaServer.query({query: query});
   }
