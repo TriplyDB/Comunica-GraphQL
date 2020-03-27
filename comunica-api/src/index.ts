@@ -27,7 +27,7 @@ commander.parse(process.argv);
 const port = commander.port || DEFAULT_PORT;
 
 function log(...args:any[]){
-   console.log(args);
+  if (commander.verbose) console.log(args);
 }
 
 interface RequestConfig {
