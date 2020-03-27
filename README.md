@@ -5,7 +5,7 @@ sources. The API must be manually configured once per Linked Data
 source, and can then be queried by others.
 
 Optionally, it is possible to mix Linked Data backends with regular
-GraphQL backends, and expose them through one unified GraphQL Gateway.
+GraphQL backends, and expose them through one unified Apollo Gateway.
 
 ## Usage
 
@@ -51,13 +51,13 @@ no downtime during configuration changes.
 ## Advanced usage
 
 The above instructions explain the basic use case of running one
-GraphQL API over one Linekd Data source.
+GraphQL API over one Linked Data source.
 
-This section explains to following more advanced use cases:
+This section explains the following, more advanced use cases:
 
-  - Exposing multiple Linked Data sources.
+  - Expose multiple Linked Data sources.
   - Mix Linked Data sources with regular GraphQL endpoints.
-  - Run a GraphQL Gateway + developer GUI
+  - Run an Apollo Gateway with query editor (GUI).
 
 ### Expose multiple Linked Data sources
 
@@ -84,9 +84,9 @@ yarn run dev
 The default port for the regular GraphQL backend is 3001.  A different
 port can be specified with the `--port` flag.
 
-### Start a GraphQL Gateway
+### Run an Apollo Gateway
 
-Run the following commands to start a unified GraphQL Gateway over an
+Run the following commands to start a unified Apollo Gateway over an
 arbitrary number of Linked Data and non-Linked Data backends:
 
 ```sh
@@ -96,7 +96,8 @@ yarn run dev
 ```
 
 The default port for the Gateway is 3500.  A different port can be
-specified with the `--port` flag.
+specified with the `--port` flag.  This port can be visited with a web
+browser to bring up a query editor (GUI).
 
 This list of used backens is stored in variable `serviceList` in flle
 [apollo-gateway/src/index.ts](apollo-gateway/src/index.ts).
@@ -106,7 +107,7 @@ This list of used backens is stored in variable `serviceList` in flle
 This sections explans the structure of the source files in this
 repository.
 
-### Comunica source (`comunica-api`)
+### Comunica source ([`/comunica-api`](comunica-api))
 
 Using Comunica and GraphQL-LD, this wraps over a single RDF-based
 source, and exposes it as a GraphQL endpoint. Additionally, a simple
@@ -125,13 +126,13 @@ Required configuration:
 - JSON-LD context: for non-introspection queries handled by GraphQL-LD
 - GraphQL schema: for introspection queries handled by Apollo
 
-### GraphQL source (`apollo-api`)
+### GraphQL source ([`/apollo-api`](apollo-api))
 
 This sets up a simple GraphQL endpoint with some dummy resolvers.
 
 This can be replaced by any other GraphQL endpoint.
 
-### GraphQL federator (`apollo-gateway`)
+### GraphQL federator ([`/apollo-gateway`](apollo-gateway))
 
 This sets up a root GraphQL endpoint that federates over any number of
 GraphQL endpoints. In this case, it federates over
@@ -357,7 +358,14 @@ Two queries that shouw how the BAG is connected to the CBS data set.
 }
 ```
 ## Extend functionality
-To be able to be used in a federated setting, we need to be able to use the extend keyword in our schemas/typeDefs. Currently, this does not work out of the box yet. For instance if we start the comunica-api (load these with the configurator), apollo-api and then the apollo-gateway, the following query is syntactically accepted, but it is not resolved properly:
+
+To be able to be used in a federated setting, we need to be able to
+use the extend keyword in our schemas/typeDefs.  Currently, this does
+not work out-of-the-box yet.  For instance, if we start a Comunica
+service and run a configuration script (see Section [Usage](#usage)),
+and then query it through an Apollo Gateway (see Section [Run an
+Apollo Gateway](#run-an-apollo-gateway)), the following query is
+syntactically accepted, but is not resolved properly:
 
 ```graphql
 {
@@ -371,11 +379,8 @@ To be able to be used in a federated setting, we need to be able to use the exte
 }
 ```
 
-It is possible that the sub query that goes to the Express server and does not get redirected to the comunica module(properly)
-
-
-
-
+It is possible that the sub query that goes to the Express server and
+does not get redirected to the Comunica module (properly).
 
 ## Known limitations
 
