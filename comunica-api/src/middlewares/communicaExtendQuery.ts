@@ -1,6 +1,6 @@
 import { Converter } from "graphql-to-sparql";
 import * as RDF from "rdf-js";
-import { Factory, Algebra } from "sparqlalgebrajs";
+import { Factory, Algebra, toSparql } from "sparqlalgebrajs";
 import * as DataFactory from "@rdfjs/data-model";
 
 let converter: Converter = new Converter();
@@ -47,6 +47,14 @@ async function communicaQuery(query: string, context: Context) {
   return sparqlAlgebraCommunica;
 }
 
+function returnLiteral(value: string, datatype: RDF.NamedNode) {
+  const x = DataFactory.literal(value, datatype);
+  if ("http://www.w3.org/2001/XMLSchema#string" === datatype.value) {
+    x.datatype = null;
+  }
+  return x;
+}
+
 export async function communicaExtendQuery(
   query: string,
   context: Context,
@@ -61,26 +69,29 @@ export async function communicaExtendQuery(
   // GENERATION OF variables bgp
   const valuesBgp = Object.keys(representations[0])
     .filter(key => key !== "__typename")
-    .map(key => OperationFactory.createPattern(
-      DataFactory.variable("_entities"),
-      DataFactory.namedNode(context["@context"]["" + key]),
-      DataFactory.variable("representations_" + key)));
+    .map(key =>
+      OperationFactory.createPattern(
+        DataFactory.variable("_entities"),
+        DataFactory.namedNode(context["@context"]["" + key]),
+        DataFactory.variable("representations_" + key)
+      )
+    );
 
   // GENERATION OF VALUES CLAUSE
   const variablesBinding = Object.keys(representations[0])
     .filter(key => key !== "__typename")
     .map(key => DataFactory.variable("representations_" + key));
 
-  const valueBindings = representations
-    .map(variable => Object.keys(variable)
+  const valueBindings = representations.map(variable =>
+    Object.keys(variable)
       .filter(key => key !== "__typename")
       .map((key: string) => ({
-        [`?representations_${key}`]: (context["@context"][variable[key]]
+        [`?representations_${key}`]: context["@context"][variable[key]]
           ? DataFactory.namedNode(context["@context"][variable[key]])
-          : DataFactory.literal("" + variable[key], retrieveDatatype(variable[key])))
+          : returnLiteral("" + variable[key], retrieveDatatype(variable[key]))
       }))
       .reduce((obj, item) => ({ ...obj, ...item }), {})
-    );
+  );
 
   //CONTRUCTION OF COMBINED VALUES CLAUSE WITH SPARQL
   const sparqlAlgebra = OperationFactory.createProject(
@@ -91,7 +102,7 @@ export async function communicaExtendQuery(
         sparqlAlgebraCommunica.input
       )
     ),
-    sparqlAlgebraCommunica.variables
+    [...variablesBinding, ...sparqlAlgebraCommunica.variables]
   );
   return {
     sparqlAlgebra: sparqlAlgebra,

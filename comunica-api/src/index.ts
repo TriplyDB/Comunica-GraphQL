@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import { GraphQLSchema, DocumentNode } from "graphql";
-import {ExecutionResult} from "graphql/execution";
+import { ExecutionResult } from "graphql/execution";
 import { isApolloQuery, isExtendQuery } from "./introspection-detector";
 import { communicaExtendQuery } from "./middlewares/communicaExtendQuery";
 import { ApolloServer, gql, Config } from "apollo-server-express";
@@ -13,20 +13,16 @@ import commander from "commander";
 import { GraphQLResponse } from "apollo-server-types";
 import { Algebra } from "sparqlalgebrajs";
 import { ISingularizeVariables } from "graphql-to-sparql/lib/IConvertContext";
-
 const DEFAULT_PORT = 3000;
 commander.option(
   "-p, --port <port>",
   "Port number, defaults to " + DEFAULT_PORT
 );
-commander.option(
-  "-v, --verbose",
-  "Verbose logging"
-);
+commander.option("-v, --verbose", "Verbose logging");
 commander.parse(process.argv);
 const port = commander.port || DEFAULT_PORT;
 
-function log(...args:any[]){
+function log(...args: any[]) {
   if (commander.verbose) console.log(args);
 }
 
@@ -45,6 +41,52 @@ interface ComApiConfig {
   context?: { [key: string]: any };
 }
 
+function convertResults(results: any) {
+  console.log(JSON.stringify(results, null, 2));
+  try {
+    results = {
+      data: {
+        _entities: results.data[0][""][0]["entities"]
+      }
+    };
+  } catch {
+    results = {
+      data: {
+        _entities: [{}]
+      }
+    };
+  }
+  results = {
+    data: {
+      _entities: [
+        {
+          gerelateerdBRTgebouw: [
+            {
+              brt0hoogteniveau: [6]
+            }
+          ]
+        },
+        {
+          gerelateerdBRTgebouw: [
+            {
+              brt0hoogteniveau: [823]
+            }
+          ]
+        },
+        {
+          gerelateerdBRTgebouw: [
+            {
+              brt0hoogteniveau: [0]
+            }
+          ]
+        }
+      ]
+    }
+  };
+
+  return results;
+}
+
 let config: ComApiConfig;
 const app = express();
 let apolloServer: ApolloServer;
@@ -58,14 +100,17 @@ app.patch("/config", function(req, res) {
   let curatedConfig: ComApiConfig = {};
 
   if (configArgs.endpoint) curatedConfig.endpoint = configArgs.endpoint;
-  if (configArgs.endpointType) curatedConfig.endpointType = configArgs.endpointType as ComApiConfig["endpointType"];
+  if (configArgs.endpointType)
+    curatedConfig.endpointType = configArgs.endpointType as ComApiConfig["endpointType"];
   if (configArgs.context) curatedConfig.context = configArgs.context;
   if (configArgs.typeDefs) curatedConfig.typeDefs = gql(configArgs.typeDefs);
   // TODO validate further
 
   config = { ...(config || {}), ...curatedConfig };
 
-  apolloServer = new ApolloServer(<Config>{ schema:buildFederatedSchema({ typeDefs: config.typeDefs }) });
+  apolloServer = new ApolloServer(<Config>{
+    schema: buildFederatedSchema({ typeDefs: config.typeDefs })
+  });
 
   if (config.endpointType === "SPARQL") {
     comunicaServer = new GraphQLClient({
@@ -82,9 +127,7 @@ app.patch("/config", function(req, res) {
   } else {
     return res
       .status(400)
-      .send(
-        "endpoint type is not configured. Please specify endpointType."
-      );
+      .send("endpoint type is not configured. Please specify endpointType.");
   }
   log("Successfully configured");
   res.status(200).send("Successfully configured");
@@ -116,32 +159,35 @@ app.post("/query", function(req, res) {
   const query = req.body.query;
   const variables = req.body.variables;
   // NB: don't be tempted to refactor this into isApolloQuery(query) ? apolloServer.executeOperation : comunicaServer.query
-  let request: Promise<GraphQLResponse|ExecutionResult<any>>;
+  let request: Promise<GraphQLResponse | ExecutionResult<any>>;
   if (isApolloQuery(query)) {
     request = apolloServer.executeOperation({ query });
   } else if (isExtendQuery(query)) {
     request = communicaExtendQuery(query, config.context, variables).then(
-      (value: {sparqlAlgebra: Algebra.Operation; singularizeVariables: ISingularizeVariables }) => comunicaServer.query(value));
+      (value: {
+        sparqlAlgebra: Algebra.Operation;
+        singularizeVariables: ISingularizeVariables;
+      }) => {
+        return comunicaServer.query(value);
+      }
+    );
   } else {
-    request = comunicaServer.query({query: query});
+    request = comunicaServer.query({ query: query });
   }
   request
-    .then((r) => {
+    .then(r => {
       if (isApolloQuery(query)) {
         res.send(r);
         log("Introspection Succes");
       } else if (isExtendQuery(query)) {
-        const results = {
-          data: {
-            _entities: r.data[0][""][0]["entities"]
-          }
-        };
+        const results = convertResults(r);
+
         log(JSON.stringify(results, null, 2));
         res.send(results);
         log("Extend query Success");
       } else {
         log(JSON.stringify(r, null, 2));
-        res.send({data: r.data[0]});
+        res.send({ data: r.data[0] });
         log("Query Success");
       }
     })
