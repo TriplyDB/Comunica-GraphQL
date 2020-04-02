@@ -13,10 +13,8 @@ const typeDefs = `
   }
 
   extend type BAGPND @key(fields: "bag0oorspronkelijkBouwjaar"){
-    bag0oorspronkelijkBouwjaar: Int! @external
+    bag0oorspronkelijkBouwjaar: [String]! @external
     gerelateerdBRTgebouw: [brt0Gebouw]
-    bag0huisletter: [String]
-    bag0huisnummer: [Int]
   }
 
   type bag0Pand  {
@@ -157,7 +155,7 @@ const context = {
     bag0nevenadres:
       "http://bag.basisregistraties.overheid.nl/def/bag#nevenadres",
     bag0oorspronkelijkBouwjaar:
-      "http://bag.basisregistraties.overheid.nl/def/bag#oorspronkelijkBouwjaar",
+      "http://bag.basisregistraties.overheid.nl/def/bag#identificatiecode",
     bag0oppervlakte:
       "http://bag.basisregistraties.overheid.nl/def/bag#oppervlakte",
     bag0pandrelatering:
