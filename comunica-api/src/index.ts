@@ -9,6 +9,7 @@ import { buildFederatedSchema } from "@apollo/federation";
 import { Client as GraphQLClient } from "graphql-ld";
 import { QueryEngineComunica } from "graphql-ld-comunica";
 import { QueryEngineSparqlEndpoint } from "graphql-ld-sparqlendpoint";
+import { Converter as SparqlJsonToTreeConverter } from "sparqljson-to-tree";
 import commander from "commander";
 import { GraphQLResponse } from "apollo-server-types";
 import { Algebra } from "sparqlalgebrajs";
@@ -42,13 +43,11 @@ interface ComApiConfig {
 }
 
 function convertResults(results: any) {
-  console.log(JSON.stringify(results, null, 2));
   try {
-    results = {
-      data: {
-        _entities: results.data[0][""][0]["entities"]
-      }
-    };
+    var cleanResult = { _entities: new Array() };
+    for (const element of results.data) {
+      cleanResult["_entities"].push(element[""][0]["entities"][0]);
+    }
   } catch {
     results = {
       data: {
@@ -57,32 +56,9 @@ function convertResults(results: any) {
     };
   }
   results = {
-    data: {
-      _entities: [
-        {
-          gerelateerdBRTgebouw: [
-            {
-              brt0hoogteniveau: [6]
-            }
-          ]
-        },
-        {
-          gerelateerdBRTgebouw: [
-            {
-              brt0hoogteniveau: [823]
-            }
-          ]
-        },
-        {
-          gerelateerdBRTgebouw: [
-            {
-              brt0hoogteniveau: [0]
-            }
-          ]
-        }
-      ]
-    }
+    data: cleanResult
   };
+  log(JSON.stringify(results, null, 2));
 
   return results;
 }
@@ -162,7 +138,7 @@ app.post("/query", function(req, res) {
   let request: Promise<GraphQLResponse | ExecutionResult<any>>;
   if (isApolloQuery(query)) {
     request = apolloServer.executeOperation({ query });
-  } else if (isExtendQuery(query)) {
+  } else if (isExtendQuery(query) && config.endpointType === "SPARQL") {
     request = communicaExtendQuery(query, config.context, variables).then(
       (value: {
         sparqlAlgebra: Algebra.Operation;
@@ -171,6 +147,8 @@ app.post("/query", function(req, res) {
         return comunicaServer.query(value);
       }
     );
+  } else if (isExtendQuery(query) && config.endpointType !== "SPARQL") {
+    return res.status(400).send("endpoint type can not handle extend queries.");
   } else {
     request = comunicaServer.query({ query: query });
   }

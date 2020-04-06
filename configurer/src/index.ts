@@ -13,7 +13,7 @@ const typeDefs = `
   }
 
   extend type BAGPND @key(fields: "bag0oorspronkelijkBouwjaar"){
-    bag0oorspronkelijkBouwjaar: [String]! @external
+    bag0oorspronkelijkBouwjaar: String! @external
     gerelateerdBRTgebouw: [brt0Gebouw]
   }
 

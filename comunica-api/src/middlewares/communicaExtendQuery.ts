@@ -1,6 +1,6 @@
 import { Converter } from "graphql-to-sparql";
 import * as RDF from "rdf-js";
-import { Factory, Algebra, toSparql } from "sparqlalgebrajs";
+import { Factory, Algebra } from "sparqlalgebrajs";
 import * as DataFactory from "@rdfjs/data-model";
 
 let converter: Converter = new Converter();
@@ -104,8 +104,27 @@ export async function communicaExtendQuery(
     ),
     [...variablesBinding, ...sparqlAlgebraCommunica.variables]
   );
+  const singularizedVars: { [key: string]: boolean } = {};
+  for (var variableBind of [
+    ...variablesBinding,
+    ...sparqlAlgebraCommunica.variables
+  ]) {
+    var name: string = "";
+    for (const element of variableBind.value.split("_")) {
+      name = name + element;
+      name = name.replace("_entities", "entities");
+      if (name.includes("entities")) {
+        singularizedVars[name] = false;
+      } else {
+        singularizedVars[name] = true;
+      }
+      name = name + "_";
+    }
+  }
+  singularizedVars[""] = false;
+  singularizedVars["entities"] = false;
   return {
     sparqlAlgebra: sparqlAlgebra,
-    singularizeVariables: {}
+    singularizeVariables: singularizedVars
   };
 }
