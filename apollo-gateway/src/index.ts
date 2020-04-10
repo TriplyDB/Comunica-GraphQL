@@ -3,7 +3,7 @@ import {ApolloGateway} from "@apollo/gateway";
 
 const gateway = new ApolloGateway({
  serviceList: [
-   { name: 'comunica-service-1', url: 'http://localhost:3000/query' },
+   { name: 'comunica-service-1', url: 'http://localhost:3000/graphql' },
    { name: 'graphql-service-1', url: 'http://localhost:3001' },
  ]
 });

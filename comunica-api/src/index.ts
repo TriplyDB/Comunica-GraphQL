@@ -111,7 +111,7 @@ app.patch("/config", function(req, res) {
 });
 
 // Setting up the post request which we use to pass the arguments to Comunica
-app.post("/query", function(req, res) {
+app.post("/graphql", function(req, res) {
   if (!config) {
     return res
       .status(400)
