@@ -13,11 +13,6 @@ export const typeDefs = `
 
   }
 
-  extend type DS84583NEDUData @key (fields: Codering_3){
-    Codering_3: String! @external
-    geo0hasGeometry: [geo0Geometry]
-  }
-
   extend type perBuurt @key (fields: "buurtCode") {
     buurtCode: String! @external
     geo0hasGeometry: [geo0Geometry]
