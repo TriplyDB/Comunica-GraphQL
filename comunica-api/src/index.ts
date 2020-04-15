@@ -14,7 +14,18 @@ import commander from "commander";
 import { GraphQLResponse } from "apollo-server-types";
 import { Algebra } from "sparqlalgebrajs";
 import { ISingularizeVariables } from "graphql-to-sparql/lib/IConvertContext";
-const DEFAULT_PORT = 3000;
+const { bootstrap: bootstrapGlobalAgent } = require('global-agent');
+import {
+  endpoint,
+  endpointType,
+  typeDefs,
+  context
+} from "./configurations/index";
+const DEFAULT_PORT = 4020;
+
+
+// Setup global support for environment variable based proxy configuration.
+bootstrapGlobalAgent();
 commander.option(
   "-p, --port <port>",
   "Port number, defaults to " + DEFAULT_PORT
@@ -63,10 +74,32 @@ function convertResults(results: any) {
   return results;
 }
 
-let config: ComApiConfig;
+const startTypeDefs = gql(typeDefs)
 const app = express();
-let apolloServer: ApolloServer;
+let config: ComApiConfig = {
+  endpoint,
+  endpointType,
+  typeDefs: startTypeDefs,
+  context
+};
+let apolloServer: ApolloServer = new ApolloServer(<Config>{
+  schema: buildFederatedSchema({ typeDefs: startTypeDefs }),
+});
+
 let comunicaServer: GraphQLClient;
+if (config.endpointType === "SPARQL") {
+  comunicaServer = new GraphQLClient({
+    context: config.context,
+    queryEngine: new QueryEngineSparqlEndpoint(config.endpoint)
+  });
+} else if (config.endpointType === "fragments") {
+  comunicaServer = new GraphQLClient({
+    context: config.context,
+    queryEngine: new QueryEngineComunica({
+      sources: [{ type: "hypermedia", value: config.endpoint }]
+    })
+  });
+}
 
 app.use(bodyParser.json()); // for parsing application/json
 
