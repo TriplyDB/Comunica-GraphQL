@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import { GraphQLSchema, DocumentNode } from "graphql";
 import { ExecutionResult } from "graphql/execution";
 import { isApolloQuery, isExtendQuery } from "./introspection-detector";
-import { communicaExtendQuery } from "./middlewares/communicaExtendQuery";
+import { comunicaExtendQuery } from "./middlewares/comunicaExtendQuery";
 import { ApolloServer, gql, Config } from "apollo-server-express";
 import { buildFederatedSchema } from "@apollo/federation";
 import { Client as GraphQLClient } from "graphql-ld";
@@ -172,7 +172,7 @@ app.post("/graphql", function(req, res) {
   if (isApolloQuery(query)) {
     request = apolloServer.executeOperation({ query });
   } else if (isExtendQuery(query) && config.endpointType === "SPARQL") {
-    request = communicaExtendQuery(query, config.context, variables).then(
+    request = comunicaExtendQuery(query, config.context, variables).then(
       (value: {
         sparqlAlgebra: Algebra.Operation;
         singularizeVariables: ISingularizeVariables;

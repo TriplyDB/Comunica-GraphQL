@@ -2,7 +2,7 @@ import {expect} from "chai";
 
 import * as DataFactory from "@rdfjs/data-model";
 import { Factory } from "sparqlalgebrajs";
-import { communicaExtendQuery } from "../middlewares/communicaExtendQuery";
+import { comunicaExtendQuery } from "../middlewares/comunicaExtendQuery";
 import { gql } from "apollo-server";
 
 const OperationFactory = new Factory(DataFactory);
@@ -31,7 +31,7 @@ describe("Converter", () => {
 
       return expect(
         JSON.stringify(
-          (await communicaExtendQuery(
+          (await comunicaExtendQuery(
             `query($representations:[_Any!]!)
                     {_entities(representations:$representations){
                       ...on BAGPND{
@@ -176,7 +176,7 @@ describe("Converter", () => {
 
       return expect(
         JSON.stringify(
-          (await communicaExtendQuery(
+          (await comunicaExtendQuery(
             `query($representations:[_Any!]!)
                 {_entities(representations:$representations){
                   ...on BAGPND{
@@ -317,7 +317,7 @@ describe("Converter", () => {
 
       return expect(
         JSON.stringify(
-          (await communicaExtendQuery(
+          (await comunicaExtendQuery(
             `query($representations:[_Any!]!)
                   {_entities(representations:$representations){
                     ...on BAGPND{
@@ -471,7 +471,7 @@ describe("Converter", () => {
 
       return expect(
         JSON.stringify(
-          (await communicaExtendQuery(
+          (await comunicaExtendQuery(
             `query($representations:[_Any!]!)
                 {_entities(representations:$representations){
                   ...on BAGPND{

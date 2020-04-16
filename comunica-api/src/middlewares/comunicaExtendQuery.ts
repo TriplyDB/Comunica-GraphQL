@@ -26,25 +26,25 @@ function retrieveDatatype(value: any): RDF.NamedNode {
   }
 }
 
-async function communicaQuery(query: string, context: Context) {
+async function comunicaQuery(query: string, context: Context) {
   query = query.replace(
     `query($representations:[_Any!]!)`,
     `query($representations:_Any!)`
   );
-  const sparqlAlgebraCommunica: Algebra.Operation = await converter.graphqlToSparqlAlgebra(
+  const sparqlAlgebraComunica: Algebra.Operation = await converter.graphqlToSparqlAlgebra(
     query,
     context,
     {
       variablesDict: { representations: { kind: "StringValue", value: "" } }
     }
   );
-  sparqlAlgebraCommunica.input.left.patterns = sparqlAlgebraCommunica.input.left.patterns.filter(
+  sparqlAlgebraComunica.input.left.patterns = sparqlAlgebraComunica.input.left.patterns.filter(
     (item: RDF.BaseQuad) => {
       item.predicate.value != "entities" &&
         item.predicate.value != "representations";
     }
   );
-  return sparqlAlgebraCommunica;
+  return sparqlAlgebraComunica;
 }
 
 function returnLiteral(value: string, datatype: RDF.NamedNode) {
@@ -55,14 +55,14 @@ function returnLiteral(value: string, datatype: RDF.NamedNode) {
   return x;
 }
 
-export async function communicaExtendQuery(
+export async function comunicaExtendQuery(
   query: string,
   context: Context,
   variables: { representations: { [key: string]: any }[] }
 ) {
   // CONVERSION OF GRAPHQL to SPARQL
 
-  const sparqlAlgebraCommunica = await communicaQuery(query, context);
+  const sparqlAlgebraComunica = await comunicaQuery(query, context);
 
   const representations = variables.representations;
 
@@ -99,15 +99,15 @@ export async function communicaExtendQuery(
       OperationFactory.createValues(variablesBinding, valueBindings),
       OperationFactory.createJoin(
         OperationFactory.createBgp(valuesBgp),
-        sparqlAlgebraCommunica.input
+        sparqlAlgebraComunica.input
       )
     ),
-    [...variablesBinding, ...sparqlAlgebraCommunica.variables]
+    [...variablesBinding, ...sparqlAlgebraComunica.variables]
   );
   const singularizedVars: { [key: string]: boolean } = {};
   for (var variableBind of [
     ...variablesBinding,
-    ...sparqlAlgebraCommunica.variables
+    ...sparqlAlgebraComunica.variables
   ]) {
     var name: string = "";
     for (const element of variableBind.value.split("_")) {
